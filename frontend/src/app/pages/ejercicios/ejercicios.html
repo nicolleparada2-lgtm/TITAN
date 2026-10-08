@@ -1,0 +1,358 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+    <div>
+      <span class="seccion">CATÁLOGO</span>
+      <h1>Ejercicios</h1>
+      <p>
+        Consulta y administra los ejercicios disponibles
+        para las rutinas de entrenamiento.
+      </p>
+    </div>
+
+    @if (puedeCrearEditar()) {
+      <button
+        class="boton primario"
+        type="button"
+        (click)="abrirFormulario()">
+        + Nuevo ejercicio
+      </button>
+    }
+  </header>
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (mostrarFormulario) {
+    <section class="tarjeta formulario">
+
+      <div class="titulo-formulario">
+        <div>
+          <h2>
+            {{ editando ? 'Editar ejercicio' : 'Nuevo ejercicio' }}
+          </h2>
+          <p>Completa la información del ejercicio.</p>
+        </div>
+
+        <button
+          type="button"
+          class="cerrar"
+          aria-label="Cerrar formulario"
+          (click)="cancelarFormulario()">
+          ×
+        </button>
+      </div>
+
+      <form (ngSubmit)="guardarEjercicio()">
+
+        <div class="fila-formulario">
+
+          <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              [(ngModel)]="nombre"
+              placeholder="Ej. Press de banca">
+          </div>
+
+          <div class="campo">
+            <label for="grupo">Grupo muscular</label>
+            <select
+              id="grupo"
+              name="grupo"
+              [(ngModel)]="grupoMuscularId">
+              <option [ngValue]="0">
+                Selecciona un grupo
+              </option>
+
+              @for (grupo of gruposMusculares; track grupo.id) {
+                <option [ngValue]="grupo.id">
+                  {{ grupo.nombre }}
+                </option>
+              }
+            </select>
+          </div>
+
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            rows="3"
+            [(ngModel)]="descripcion"
+            placeholder="Descripción breve del ejercicio">
+          </textarea>
+        </div>
+
+        <div class="campo">
+          <label for="instrucciones">Instrucciones</label>
+          <textarea
+            id="instrucciones"
+            name="instrucciones"
+            rows="4"
+            [(ngModel)]="instrucciones"
+            placeholder="Explica cómo realizar correctamente el ejercicio">
+          </textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="cancelarFormulario()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="boton primario"
+            [disabled]="guardando">
+            {{
+              guardando
+                ? 'Guardando...'
+                : editando
+                  ? 'Guardar cambios'
+                  : 'Crear ejercicio'
+            }}
+          </button>
+        </div>
+
+      </form>
+    </section>
+  }
+
+  <section class="tarjeta">
+
+    <div class="barra-herramientas">
+
+      <div class="buscador">
+        <input
+          type="search"
+          [(ngModel)]="busqueda"
+          aria-label="Buscar ejercicio"
+          placeholder="Buscar ejercicio...">
+      </div>
+
+      <select
+        class="filtro"
+        [(ngModel)]="grupoFiltro"
+        aria-label="Filtrar por grupo muscular">
+
+        <option [ngValue]="0">
+          Todos los grupos
+        </option>
+
+        @for (grupo of gruposMusculares; track grupo.id) {
+          <option [ngValue]="grupo.id">
+            {{ grupo.nombre }}
+          </option>
+        }
+
+      </select>
+
+    </div>
+
+    @if (cargando) {
+
+      <div class="estado">
+        <h3>Cargando ejercicios</h3>
+        <p>Estamos obteniendo la información.</p>
+      </div>
+
+    } @else if (ejerciciosFiltrados.length === 0) {
+
+      <div class="estado">
+        <h3>No hay ejercicios para mostrar</h3>
+        <p>
+          No encontramos ejercicios con los filtros actuales.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="tabla-contenedor">
+
+        <table>
+          <thead>
+            <tr>
+              <th>Ejercicio</th>
+              <th>Grupo muscular</th>
+              <th>Descripción</th>
+
+              @if (puedeCrearEditar()) {
+                <th class="acciones-columna">
+                  Acciones
+                </th>
+              }
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (ejercicio of ejerciciosFiltrados; track ejercicio.id) {
+              <tr>
+
+                <td>
+                  <div class="ejercicio-nombre">
+                    <div class="inicial">
+                      {{ ejercicio.nombre.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div>
+                      <strong>{{ ejercicio.nombre }}</strong>
+
+                      @if (ejercicio.instrucciones) {
+                        <small>
+                          {{ ejercicio.instrucciones }}
+                        </small>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="etiqueta">
+                    {{
+                      obtenerNombreGrupo(
+                        ejercicio.grupo_muscular_id
+                      )
+                    }}
+                  </span>
+                </td>
+
+                <td>
+                  {{
+                    ejercicio.descripcion ||
+                    'Sin descripción'
+                  }}
+                </td>
+
+                @if (puedeCrearEditar()) {
+                  <td class="acciones">
+
+                    <button
+                      type="button"
+                      class="accion editar"
+                      (click)="editarEjercicio(ejercicio)">
+                      Editar
+                    </button>
+
+                    @if (puedeEliminar()) {
+                      <button
+                        type="button"
+                        class="accion eliminar"
+                        (click)="eliminarEjercicio(ejercicio)">
+                        Eliminar
+                      </button>
+                    }
+
+                  </td>
+                }
+
+              </tr>
+            }
+
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="pie-tabla">
+        {{ ejerciciosFiltrados.length }}
+        ejercicio(s)
+      </div>
+    }
+
+  </section>
+
+</div>
+
+@if (ejercicioPorEliminar; as ejercicio) {
+  <div class="modal-fondo">
+
+    <section
+      class="modal-confirmacion"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-titulo"
+      aria-describedby="modal-descripcion">
+
+      <div class="modal-superior">
+        <div class="modal-icono" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="23"
+            height="23"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M5 6l1 15h12l1-15"></path>
+            <path d="M10 10v7"></path>
+            <path d="M14 10v7"></path>
+          </svg>
+        </div>
+
+        <button
+          type="button"
+          class="modal-cerrar"
+          aria-label="Cerrar confirmación"
+          [disabled]="eliminando"
+          (click)="cancelarEliminacion()">
+          ×
+        </button>
+      </div>
+
+      <h2 id="modal-titulo">
+        ¿Eliminar ejercicio?
+      </h2>
+
+      <p id="modal-descripcion" class="modal-descripcion">
+        Estás a punto de eliminar
+        <strong>{{ ejercicio.nombre }}</strong>
+        del catálogo de ejercicios.
+      </p>
+
+      <p class="modal-advertencia">
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="modal-acciones">
+        <button
+          type="button"
+          class="boton modal-cancelar"
+          [disabled]="eliminando"
+          (click)="cancelarEliminacion()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarEliminacion()">
+          {{ eliminando ? 'Eliminando...' : 'Eliminar ejercicio' }}
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+}

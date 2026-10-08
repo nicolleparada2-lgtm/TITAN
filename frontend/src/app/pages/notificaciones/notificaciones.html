@@ -1,0 +1,151 @@
+<div class="pagina-notificaciones">
+
+  <header class="encabezado">
+    <div>
+      <p class="etiqueta">Mi cuenta</p>
+      <h1>Notificaciones</h1>
+
+      <p class="descripcion">
+        Consulta los avisos importantes relacionados con tu cuenta
+        y los servicios del gimnasio.
+      </p>
+    </div>
+  </header>
+
+  @if (mensajeError) {
+    <div class="alerta-error">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (cargando) {
+
+    <section class="estado-pagina">
+      <div class="estado-icono">N</div>
+      <h2>Cargando notificaciones</h2>
+      <p>Estamos consultando los avisos de tu cuenta.</p>
+    </section>
+
+  } @else if (notificaciones.length === 0) {
+
+    <section class="estado-pagina">
+      <div class="estado-icono">N</div>
+      <h2>Todo al día</h2>
+
+      <p>
+        No tienes notificaciones por el momento.
+        Cuando haya un aviso importante aparecerá aquí.
+      </p>
+    </section>
+
+  } @else {
+
+    <section class="resumen">
+
+      <div class="resumen-item">
+        <span>Total</span>
+        <strong>{{ notificaciones.length }}</strong>
+      </div>
+
+      <div class="resumen-item destacada">
+        <span>Sin leer</span>
+        <strong>{{ cantidadNoLeidas() }}</strong>
+      </div>
+
+      <div class="resumen-item">
+        <span>Leídas</span>
+        <strong>{{ cantidadLeidas() }}</strong>
+      </div>
+
+    </section>
+
+    <section class="panel-notificaciones">
+
+      <div class="panel-encabezado">
+        <div>
+          <h2>Actividad reciente</h2>
+          <p>Consulta los avisos asociados a tu cuenta.</p>
+        </div>
+
+        @if (hayNoLeidas()) {
+          <button
+            class="boton-leer-todas"
+            type="button"
+            [disabled]="procesando"
+            (click)="marcarTodasComoLeidas()">
+            Marcar todas como leídas
+          </button>
+        }
+      </div>
+
+      <div class="lista-notificaciones">
+
+        @for (notificacion of notificaciones; track notificacion.id) {
+
+          <article
+            class="notificacion"
+            [class.no-leida]="!notificacion.leida">
+
+            <div class="notificacion-icono">
+              N
+            </div>
+
+            <div class="notificacion-contenido">
+
+              <div class="notificacion-superior">
+
+                <div class="titulo-contenedor">
+                  <h3>{{ notificacion.titulo }}</h3>
+
+                  @if (!notificacion.leida) {
+                    <span class="punto-nuevo"></span>
+                  }
+                </div>
+
+                <span class="fecha">
+                  {{ formatearFecha(notificacion.fecha_creacion) }}
+                </span>
+
+              </div>
+
+              <p>
+                {{ notificacion.mensaje }}
+              </p>
+
+              <div class="notificacion-pie">
+
+                <span
+                  class="tipo"
+                  [class.tipo-aviso]="notificacion.tipo === 'MENSUALIDAD_POR_VENCER'"
+                  [class.tipo-vencida]="notificacion.tipo === 'MENSUALIDAD_VENCIDA'">
+                  {{ nombreTipo(notificacion.tipo) }}
+                </span>
+
+                @if (!notificacion.leida) {
+                  <button
+                    class="boton-leida"
+                    type="button"
+                    (click)="marcarComoLeida(notificacion)">
+                    Marcar como leída
+                  </button>
+                } @else {
+                  <span class="estado-leida">
+                    Leída
+                  </span>
+                }
+
+              </div>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    </section>
+
+  }
+
+</div>

@@ -1,0 +1,166 @@
+<div class="pagina">
+
+  <header class="encabezado">
+    <div>
+      <span class="seccion">
+        SEGUIMIENTO
+      </span>
+
+      <h1>Mis usuarios</h1>
+
+      <p>
+        Consulta los usuarios que tienes asignados
+        y accede a su seguimiento.
+      </p>
+    </div>
+  </header>
+
+  @if (mensajeError) {
+    <div class="alerta error">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (cargando) {
+
+    <section class="tarjeta estado-vacio">
+      <h2>Cargando usuarios...</h2>
+
+      <p>
+        Estamos consultando tus asignaciones.
+      </p>
+    </section>
+
+  } @else if (
+    !mensajeError &&
+    usuariosAsignados.length === 0
+  ) {
+
+    <section class="tarjeta estado-vacio">
+
+      <div class="icono-vacio">
+        U
+      </div>
+
+      <h2>No tienes usuarios asignados</h2>
+
+      <p>
+        Cuando un administrador te asigne usuarios,
+        aparecerán en esta sección.
+      </p>
+
+    </section>
+
+  } @else if (!mensajeError) {
+
+    <section class="resumen">
+
+      <div class="tarjeta resumen-tarjeta">
+
+        <span class="etiqueta">
+          USUARIOS ASIGNADOS
+        </span>
+
+        <strong>
+          {{ usuariosAsignados.length }}
+        </strong>
+
+        <p>
+          Personas bajo tu seguimiento
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="lista">
+
+      @for (
+        usuario of usuariosAsignados;
+        track usuario.id
+      ) {
+
+        <article class="tarjeta usuario-card">
+
+          <div class="usuario-principal">
+
+            <div class="avatar">
+              {{ iniciales(usuario.nombre_completo) }}
+            </div>
+
+            <div class="informacion">
+
+              <div class="estado">
+                ACTIVO
+              </div>
+
+              <h2>
+                {{ usuario.nombre_completo }}
+              </h2>
+
+              <p>
+                {{ usuario.correo }}
+              </p>
+
+              <span class="nombre-usuario">
+                &#64;{{ usuario.nombre_usuario }}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="separador"></div>
+
+          <div class="seguimiento">
+
+            <span class="etiqueta">
+              SEGUIMIENTO DEL USUARIO
+            </span>
+
+            <div class="acciones">
+
+              <button
+                type="button"
+                (click)="verRutinas(usuario)">
+                Rutinas
+              </button>
+
+              <button
+                type="button"
+                (click)="verObjetivos(usuario)">
+                Objetivos
+              </button>
+
+              <button
+                type="button"
+                (click)="verMedidas(usuario)">
+                Medidas
+              </button>
+
+              <button
+                type="button"
+                (click)="verEntrenamientos(usuario)">
+                Entrenamientos
+              </button>
+
+              <button
+                type="button"
+                class="principal"
+                (click)="verProgreso(usuario)">
+                Ver progreso
+              </button>
+              
+            </div>
+
+          </div>
+
+        </article>
+
+      }
+
+    </section>
+
+  }
+
+</div>

@@ -1,0 +1,689 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <span class="seccion">
+        {{ esSeguimiento ? 'SEGUIMIENTO' : 'ENTRENAMIENTO' }}
+      </span>
+
+      <h1>Entrenamientos</h1>
+
+      <p>{{ descripcionPagina }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="boton primario"
+      (click)="abrirNuevaSesion()">
+      + Iniciar entrenamiento
+    </button>
+
+  </header>
+
+  @if (esSeguimiento && usuarioSeguimiento) {
+
+    <div class="alerta seguimiento">
+
+      <div>
+        <strong>
+          Seguimiento de {{ usuarioSeguimiento.nombre_completo }}
+        </strong>
+
+        <span>
+          &#64;{{ usuarioSeguimiento.nombre_usuario }}
+          · Estás administrando sus entrenamientos como entrenador.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="volverMisUsuarios()">
+        Volver a mis usuarios
+      </button>
+
+    </div>
+
+  }
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (mostrarNuevaSesion) {
+
+    <section class="tarjeta formulario">
+
+      <div class="titulo-formulario">
+
+        <div>
+          <h2>
+            @if (esSeguimiento && usuarioSeguimiento) {
+              Nuevo entrenamiento para
+              {{ usuarioSeguimiento.nombre_completo }}
+            } @else {
+              Nuevo entrenamiento
+            }
+          </h2>
+
+          <p>
+            Puedes utilizar una rutina o comenzar
+            un entrenamiento libre.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="cerrar"
+          aria-label="Cerrar formulario"
+          (click)="mostrarNuevaSesion = false">
+          ×
+        </button>
+
+      </div>
+
+      <form (ngSubmit)="crearSesion()">
+
+        <div class="campo">
+          <label for="rutinaSesion">Rutina</label>
+
+          <select
+            id="rutinaSesion"
+            name="rutina"
+            [(ngModel)]="rutinaId">
+
+            <option [ngValue]="0">
+              Entrenamiento libre
+            </option>
+
+            @for (rutina of rutinas; track rutina.id) {
+              <option [ngValue]="rutina.id">
+                {{ rutina.nombre }}
+              </option>
+            }
+
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="notasSesion">Notas</label>
+
+          <textarea
+            id="notasSesion"
+            name="notas"
+            rows="3"
+            [(ngModel)]="notasSesion"
+            placeholder="Notas opcionales sobre el entrenamiento">
+          </textarea>
+        </div>
+
+        <div class="acciones-formulario">
+
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="mostrarNuevaSesion = false">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="boton primario"
+            [disabled]="guardando">
+            {{ guardando ? 'Iniciando...' : 'Iniciar entrenamiento' }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  }
+
+  <div class="distribucion">
+
+    <section class="tarjeta sesiones">
+
+      <div class="cabecera-tarjeta">
+        <h2>{{ tituloHistorial }}</h2>
+        <span>{{ sesiones.length }} sesión(es)</span>
+      </div>
+
+      @if (cargando) {
+
+        <div class="estado">
+          <h3>Cargando entrenamientos</h3>
+        </div>
+
+      } @else if (sesiones.length === 0) {
+
+        <div class="estado">
+
+          <h3>No hay entrenamientos</h3>
+
+          <p>
+            @if (esSeguimiento && usuarioSeguimiento) {
+              {{ usuarioSeguimiento.nombre_completo }}
+              todavía no tiene sesiones registradas.
+            } @else {
+              Inicia tu primera sesión.
+            }
+          </p>
+
+        </div>
+
+      } @else {
+
+        <div class="lista-sesiones">
+
+          @for (sesion of sesiones; track sesion.id) {
+
+            <article
+              class="sesion"
+              [class.seleccionada]="sesionSeleccionada?.id === sesion.id"
+              (click)="seleccionarSesion(sesion)">
+
+              <div class="estado-sesion">
+
+                @if (sesionActiva(sesion)) {
+                  <span class="activo">ACTIVA</span>
+                } @else {
+                  <span class="finalizada">FINALIZADA</span>
+                }
+
+              </div>
+
+              <strong>
+                {{ obtenerNombreRutina(sesion.rutina_id) }}
+              </strong>
+
+              <small>
+                {{ formatearFecha(sesion.fecha_inicio) }}
+              </small>
+
+              <button
+                type="button"
+                class="eliminar"
+                (click)="eliminarSesion(sesion); $event.stopPropagation()">
+                Eliminar
+              </button>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+    <section class="tarjeta detalle">
+
+      @if (!sesionSeleccionada) {
+
+        <div class="estado detalle-vacio">
+
+          <div class="icono-grande">E</div>
+
+          <h3>Selecciona un entrenamiento</h3>
+
+          <p>
+            Consulta los ejercicios y las series
+            registradas en la sesión.
+          </p>
+
+        </div>
+
+      } @else {
+
+        <div class="cabecera-detalle">
+
+          <div>
+            <span class="seccion">ENTRENAMIENTO</span>
+
+            <h2>
+              {{ obtenerNombreRutina(sesionSeleccionada.rutina_id) }}
+            </h2>
+
+            <p>
+              {{ formatearFecha(sesionSeleccionada.fecha_inicio) }}
+            </p>
+          </div>
+
+          <div class="acciones-cabecera">
+
+            @if (sesionActiva(sesionSeleccionada)) {
+
+              <button
+                type="button"
+                class="boton secundario"
+                (click)="abrirNuevoEjercicio()">
+                + Ejercicio
+              </button>
+
+              <button
+                type="button"
+                class="boton finalizar"
+                (click)="finalizarSesion()">
+                Finalizar sesión
+              </button>
+
+            } @else {
+
+              <span class="badge-finalizada">
+                Sesión finalizada
+              </span>
+
+            }
+
+          </div>
+
+        </div>
+
+        @if (sesionSeleccionada.notas) {
+
+          <div class="notas">
+            {{ sesionSeleccionada.notas }}
+          </div>
+
+        }
+
+        @if (
+          mostrarNuevoEjercicio &&
+          sesionActiva(sesionSeleccionada)
+        ) {
+
+          <form
+            class="formulario-interno"
+            (ngSubmit)="agregarEjercicio()">
+
+            <h3>Agregar ejercicio</h3>
+
+            <div class="fila">
+
+              <div class="campo">
+
+                <label for="ejercicioEntrenamiento">
+                  Ejercicio
+                </label>
+
+                <select
+                  id="ejercicioEntrenamiento"
+                  name="ejercicio"
+                  [(ngModel)]="ejercicioId">
+
+                  <option [ngValue]="0">
+                    Selecciona
+                  </option>
+
+                  @for (ejercicio of ejercicios; track ejercicio.id) {
+                    <option [ngValue]="ejercicio.id">
+                      {{ ejercicio.nombre }}
+                    </option>
+                  }
+
+                </select>
+
+              </div>
+
+              <div class="campo">
+
+                <label for="ordenEjercicio">
+                  Orden
+                </label>
+
+                <input
+                  id="ordenEjercicio"
+                  type="number"
+                  name="orden"
+                  min="1"
+                  step="1"
+                  [(ngModel)]="ordenEjercicio">
+
+              </div>
+
+            </div>
+
+            <div class="campo">
+
+              <label for="notasEjercicio">
+                Notas
+              </label>
+
+              <input
+                id="notasEjercicio"
+                type="text"
+                name="notasEjercicio"
+                [(ngModel)]="notasEjercicio"
+                placeholder="Opcional">
+
+            </div>
+
+            <div class="acciones-formulario">
+
+              <button
+                type="button"
+                class="boton secundario"
+                (click)="mostrarNuevoEjercicio = false">
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                class="boton primario"
+                [disabled]="guardando">
+                {{ guardando ? 'Agregando...' : 'Agregar' }}
+              </button>
+
+            </div>
+
+          </form>
+
+        }
+
+        @if (ejerciciosSesion.length === 0) {
+
+          <div class="estado">
+
+            <h3>No hay ejercicios registrados</h3>
+
+            <p>
+              Agrega el primer ejercicio de la sesión.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="ejercicios">
+
+            @for (ejercicio of ejerciciosSesion; track ejercicio.id) {
+
+              <article class="ejercicio">
+
+                <div class="cabecera-ejercicio">
+
+                  <div>
+
+                    <span class="numero">
+                      {{ ejercicio.orden_ejercicio }}
+                    </span>
+
+                    <strong>
+                      {{ obtenerNombreEjercicio(ejercicio.ejercicio_id) }}
+                    </strong>
+
+                  </div>
+
+                  @if (sesionActiva(sesionSeleccionada)) {
+
+                    <div class="acciones-ejercicio">
+
+                      <button
+                        type="button"
+                        (click)="abrirNuevaSerie(ejercicio)">
+                        + Serie
+                      </button>
+
+                      <button
+                        type="button"
+                        class="eliminar"
+                        (click)="eliminarEjercicio(ejercicio)">
+                        Quitar
+                      </button>
+
+                    </div>
+
+                  }
+
+                </div>
+
+                @if (ejercicio.notas) {
+
+                  <p class="nota-ejercicio">
+                    {{ ejercicio.notas }}
+                  </p>
+
+                }
+
+                @if (
+                  ejercicioSerieActivo === ejercicio.id &&
+                  sesionActiva(sesionSeleccionada)
+                ) {
+
+                  <form
+                    class="nueva-serie"
+                    (ngSubmit)="crearSerie(ejercicio)">
+
+                    <div class="campo">
+
+                      <label for="numeroSerie">
+                        Serie
+                      </label>
+
+                      <input
+                        id="numeroSerie"
+                        type="number"
+                        name="numeroSerie"
+                        min="1"
+                        step="1"
+                        [(ngModel)]="numeroSerie">
+
+                    </div>
+
+                    <div class="campo">
+
+                      <label for="repeticiones">
+                        Repeticiones
+                      </label>
+
+                      <input
+                        id="repeticiones"
+                        type="number"
+                        name="repeticiones"
+                        min="1"
+                        step="1"
+                        [(ngModel)]="repeticiones">
+
+                    </div>
+
+                    <div class="campo">
+
+                      <label for="peso">
+                        Peso (kg)
+                      </label>
+
+                      <input
+                        id="peso"
+                        type="number"
+                        name="peso"
+                        min="0"
+                        step="0.01"
+                        [(ngModel)]="peso">
+
+                    </div>
+
+                    <button
+                      type="submit"
+                      class="boton primario"
+                      [disabled]="guardando">
+                      {{ guardando ? 'Guardando...' : 'Guardar' }}
+                    </button>
+
+                  </form>
+
+                }
+
+                <div class="series">
+
+                  @for (
+                    serie of (seriesPorEjercicio[ejercicio.id] || []);
+                    track serie.id
+                  ) {
+
+                    <div class="serie">
+
+                      <span class="numero-serie">
+                        {{ serie.numero_serie }}
+                      </span>
+
+                      <span>
+                        <strong>{{ serie.repeticiones }}</strong>
+                        rep.
+                      </span>
+
+                      <span>
+                        <strong>{{ serie.peso ?? 0 }}</strong>
+                        kg
+                      </span>
+
+                      @if (sesionActiva(sesionSeleccionada)) {
+
+                        <button
+                          type="button"
+                          aria-label="Eliminar serie"
+                          (click)="eliminarSerie(ejercicio.id, serie)">
+                          ×
+                        </button>
+
+                      } @else {
+
+                        <span class="serie-sin-acciones"></span>
+
+                      }
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </article>
+
+            }
+
+          </div>
+
+        }
+
+      }
+
+    </section>
+
+  </div>
+
+</div>
+
+<!-- Ventana personalizada para las cuatro confirmaciones -->
+
+@if (tipoConfirmacion) {
+
+  <div
+    class="modal-fondo"
+    (click)="cerrarConfirmacion()">
+
+    <section
+      class="modal-confirmacion"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-confirmacion"
+      aria-describedby="descripcion-confirmacion"
+      (click)="$event.stopPropagation()">
+
+      <div
+        class="modal-icono"
+        [class.modal-icono-finalizar]="tipoConfirmacion === 'FINALIZAR_SESION'">
+        {{ tipoConfirmacion === 'FINALIZAR_SESION' ? '✓' : '!' }}
+      </div>
+
+      <span class="modal-etiqueta">
+        {{
+          tipoConfirmacion === 'FINALIZAR_SESION'
+            ? 'CONFIRMAR FINALIZACIÓN'
+            : 'CONFIRMAR ELIMINACIÓN'
+        }}
+      </span>
+
+      <h2 id="titulo-confirmacion">
+        {{ tituloConfirmacion }}
+      </h2>
+
+      <p id="descripcion-confirmacion">
+        {{ descripcionConfirmacion }}
+      </p>
+
+      <div class="modal-detalle">
+
+        <span>
+          {{
+            tipoConfirmacion === 'ELIMINAR_SERIE'
+              ? 'Serie seleccionada'
+              : tipoConfirmacion === 'QUITAR_EJERCICIO'
+                ? 'Ejercicio seleccionado'
+                : 'Entrenamiento seleccionado'
+          }}
+        </span>
+
+        <strong>
+          {{ nombreElementoConfirmacion }}
+        </strong>
+
+        @if (tipoConfirmacion === 'ELIMINAR_SESION' && sesionPorEliminar) {
+          <span>
+            {{ formatearFecha(sesionPorEliminar.fecha_inicio) }}
+          </span>
+        }
+
+        @if (tipoConfirmacion === 'FINALIZAR_SESION' && sesionSeleccionada) {
+          <span>
+            {{ formatearFecha(sesionSeleccionada.fecha_inicio) }}
+          </span>
+        }
+
+        @if (tipoConfirmacion === 'ELIMINAR_SERIE' && seriePorEliminar) {
+          <span>
+            {{ seriePorEliminar.repeticiones }} repeticiones ·
+            {{ seriePorEliminar.peso ?? 0 }} kg
+          </span>
+        }
+
+      </div>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton secundario"
+          [disabled]="procesandoConfirmacion"
+          (click)="cerrarConfirmacion()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton"
+          [class.modal-eliminar]="tipoConfirmacion !== 'FINALIZAR_SESION'"
+          [class.modal-confirmar]="tipoConfirmacion === 'FINALIZAR_SESION'"
+          [disabled]="procesandoConfirmacion"
+          (click)="confirmarAccion()">
+          {{ textoBotonConfirmacion }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}

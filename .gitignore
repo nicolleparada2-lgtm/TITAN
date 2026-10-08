@@ -1,0 +1,44 @@
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Angular / Node.js
+node_modules/
+dist/
+.angular/
+coverage/
+.nx/
+.npm/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+
+# Bases de datos y copias locales
+*.sqlite3
+*.db
+*.dump
+*.backup

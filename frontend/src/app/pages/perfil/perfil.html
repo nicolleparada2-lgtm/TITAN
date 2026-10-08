@@ -1,0 +1,302 @@
+<div class="pagina-perfil">
+
+  <header class="encabezado">
+    <div>
+      <p class="etiqueta">Mi cuenta</p>
+      <h1>Perfil</h1>
+      <p>
+        Consulta y administra la información de tu cuenta.
+      </p>
+    </div>
+  </header>
+
+
+  @if (cargando) {
+
+    <div class="estado-carga">
+      <div class="spinner"></div>
+
+      <div>
+        <strong>Cargando perfil</strong>
+        <p>Consultando la información de tu cuenta.</p>
+      </div>
+    </div>
+
+  } @else if (usuario) {
+
+    <div class="perfil-grid">
+
+      <aside class="resumen-perfil">
+
+        <div class="avatar-grande">
+          {{ iniciales() }}
+        </div>
+
+        <h2>
+          {{ usuario.nombre_completo }}
+        </h2>
+
+        <p class="usuario-nombre">
+          @{{ usuario.nombre_usuario }}
+        </p>
+
+        <span class="rol">
+          {{ formatearRol(usuario.rol) }}
+        </span>
+
+
+        <div class="datos-cuenta">
+
+          <div class="dato-cuenta">
+            <span>Correo electrónico</span>
+            <strong>{{ usuario.correo }}</strong>
+          </div>
+
+          <div class="dato-cuenta">
+            <span>Estado de la cuenta</span>
+
+            <strong
+              class="estado"
+              [class.activo]="usuario.estado === 'ACTIVO'">
+              {{ usuario.estado }}
+            </strong>
+          </div>
+
+          <div class="dato-cuenta">
+            <span>Miembro desde</span>
+            <strong>
+              {{ formatearFecha(usuario.fecha_creacion) }}
+            </strong>
+          </div>
+
+        </div>
+
+      </aside>
+
+
+      <div class="contenido-perfil">
+
+        <section class="panel">
+
+          <div class="cabecera-panel">
+            <div>
+              <p class="numero-seccion">Información personal</p>
+              <h2>Datos de la cuenta</h2>
+              <p>
+                Mantén actualizados tus datos personales
+                y de acceso.
+              </p>
+            </div>
+          </div>
+
+
+          @if (mensajePerfil) {
+            <div class="alerta exito">
+              {{ mensajePerfil }}
+            </div>
+          }
+
+          @if (errorPerfil) {
+            <div class="alerta error">
+              {{ errorPerfil }}
+            </div>
+          }
+
+
+          <form
+            class="formulario"
+            (ngSubmit)="guardarPerfil()">
+
+            <div class="campo">
+              <label for="nombre_completo">
+                Nombre completo
+              </label>
+
+              <input
+                id="nombre_completo"
+                name="nombre_completo"
+                type="text"
+                [(ngModel)]="
+                  formularioPerfil.nombre_completo
+                "
+                autocomplete="name"
+                required>
+            </div>
+
+
+            <div class="fila-campos">
+
+              <div class="campo">
+                <label for="nombre_usuario">
+                  Nombre de usuario
+                </label>
+
+                <input
+                  id="nombre_usuario"
+                  name="nombre_usuario"
+                  type="text"
+                  [(ngModel)]="
+                    formularioPerfil.nombre_usuario
+                  "
+                  autocomplete="username"
+                  required>
+              </div>
+
+
+              <div class="campo">
+                <label for="correo">
+                  Correo electrónico
+                </label>
+
+                <input
+                  id="correo"
+                  name="correo"
+                  type="email"
+                  [(ngModel)]="
+                    formularioPerfil.correo
+                  "
+                  autocomplete="email"
+                  required>
+              </div>
+
+            </div>
+
+
+            <div class="acciones-formulario">
+              <button
+                class="boton-principal"
+                type="submit"
+                [disabled]="guardandoPerfil">
+
+                @if (guardandoPerfil) {
+                  Guardando...
+                } @else {
+                  Guardar cambios
+                }
+
+              </button>
+            </div>
+
+          </form>
+
+        </section>
+
+
+        <section class="panel">
+
+          <div class="cabecera-panel">
+            <div>
+              <p class="numero-seccion">Seguridad</p>
+              <h2>Cambiar contraseña</h2>
+              <p>
+                Actualiza tu contraseña para mantener
+                protegida tu cuenta.
+              </p>
+            </div>
+          </div>
+
+
+          @if (mensajeContrasena) {
+            <div class="alerta exito">
+              {{ mensajeContrasena }}
+            </div>
+          }
+
+          @if (errorContrasena) {
+            <div class="alerta error">
+              {{ errorContrasena }}
+            </div>
+          }
+
+
+          <form
+            class="formulario"
+            (ngSubmit)="cambiarContrasena()">
+
+            <div class="campo">
+              <label for="contrasena_actual">
+                Contraseña actual
+              </label>
+
+              <input
+                id="contrasena_actual"
+                name="contrasena_actual"
+                type="password"
+                [(ngModel)]="
+                  formularioContrasena.contrasena_actual
+                "
+                autocomplete="current-password"
+                required>
+            </div>
+
+
+            <div class="fila-campos">
+
+              <div class="campo">
+                <label for="contrasena_nueva">
+                  Nueva contraseña
+                </label>
+
+                <input
+                  id="contrasena_nueva"
+                  name="contrasena_nueva"
+                  type="password"
+                  [(ngModel)]="
+                    formularioContrasena.contrasena_nueva
+                  "
+                  autocomplete="new-password"
+                  minlength="8"
+                  required>
+
+                <small>
+                  Mínimo 8 caracteres.
+                </small>
+              </div>
+
+
+              <div class="campo">
+                <label for="confirmar_contrasena">
+                  Confirmar contraseña
+                </label>
+
+                <input
+                  id="confirmar_contrasena"
+                  name="confirmar_contrasena"
+                  type="password"
+                  [(ngModel)]="
+                    formularioContrasena.confirmar_contrasena
+                  "
+                  autocomplete="new-password"
+                  minlength="8"
+                  required>
+              </div>
+
+            </div>
+
+
+            <div class="acciones-formulario">
+              <button
+                class="boton-secundario"
+                type="submit"
+                [disabled]="guardandoContrasena">
+
+                @if (guardandoContrasena) {
+                  Actualizando...
+                } @else {
+                  Actualizar contraseña
+                }
+
+              </button>
+            </div>
+
+          </form>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

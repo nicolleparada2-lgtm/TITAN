@@ -1,0 +1,267 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <span class="seccion">
+        {{ esSeguimiento ? 'SEGUIMIENTO' : 'ANÁLISIS' }}
+      </span>
+
+      <h1>Progreso</h1>
+
+      <p>
+        {{ descripcionPagina }}
+      </p>
+    </div>
+
+  </header>
+
+  @if (esSeguimiento && usuarioSeguimiento) {
+
+    <div class="alerta seguimiento">
+
+      <div>
+        <strong>
+          Seguimiento de
+          {{ usuarioSeguimiento.nombre_completo }}
+        </strong>
+
+        <span>
+          &#64;{{ usuarioSeguimiento.nombre_usuario }}
+          · Estás consultando su progreso como entrenador.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="volverMisUsuarios()">
+        Volver a mis usuarios
+      </button>
+
+    </div>
+
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (cargando) {
+
+    <section class="tarjeta estado-vacio">
+
+      <h3>Cargando progreso...</h3>
+
+      <p>
+        Estamos preparando la información registrada.
+      </p>
+
+    </section>
+
+  } @else {
+
+    <section class="resumen-grid">
+
+      <article class="tarjeta resumen">
+
+        <span class="etiqueta">
+          Sesiones
+        </span>
+
+        <strong>
+          {{ resumen?.total_sesiones ?? 0 }}
+        </strong>
+
+        <p>Entrenamientos registrados</p>
+
+      </article>
+
+      <article class="tarjeta resumen">
+
+        <span class="etiqueta">
+          Objetivos
+        </span>
+
+        <strong>
+          {{ resumen?.total_objetivos ?? 0 }}
+        </strong>
+
+        <p>
+          {{ resumen?.objetivos_completados ?? 0 }}
+          completado(s)
+        </p>
+
+      </article>
+
+      <article class="tarjeta resumen">
+
+        <span class="etiqueta">
+          Peso actual
+        </span>
+
+        <strong>
+          @if (resumen?.peso_actual !== null) {
+            {{ formatearNumero(resumen?.peso_actual ?? null) }}
+            <small>kg</small>
+          } @else {
+            —
+          }
+        </strong>
+
+        <p>
+          Peso inicial:
+
+          @if (resumen?.peso_inicial !== null) {
+            {{ formatearNumero(resumen?.peso_inicial ?? null) }}
+            kg
+          } @else {
+            sin datos
+          }
+        </p>
+
+      </article>
+
+      <article class="tarjeta resumen">
+
+        <span class="etiqueta">
+          Cambio de peso
+        </span>
+
+        <strong
+          [class]="claseCambioPeso()">
+          {{ textoCambioPeso() }}
+        </strong>
+
+        <p>
+          Desde la primera medición
+        </p>
+
+      </article>
+
+    </section>
+
+    <section class="tarjeta objetivos-resumen">
+
+      <div>
+        <span class="etiqueta">
+          ESTADO DE OBJETIVOS
+        </span>
+
+        <h2>
+          Seguimiento de metas
+        </h2>
+      </div>
+
+      <div class="estadisticas-objetivos">
+
+        <div>
+          <strong>
+            {{ resumen?.objetivos_en_progreso ?? 0 }}
+          </strong>
+
+          <span>En progreso</span>
+        </div>
+
+        <div>
+          <strong>
+            {{ resumen?.objetivos_completados ?? 0 }}
+          </strong>
+
+          <span>Completados</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="graficas-grid">
+
+      <article class="tarjeta grafica">
+
+        <div class="cabecera-grafica">
+
+          <div>
+            <span class="etiqueta">
+              PESO
+            </span>
+
+            <h2>Evolución del peso</h2>
+
+            <p>
+              Cambios registrados a lo largo del tiempo.
+            </p>
+          </div>
+
+        </div>
+
+        @if (pesos.length === 0) {
+
+          <div class="estado-grafica">
+
+            <h3>Sin datos de peso</h3>
+
+            <p>
+              No hay registros de peso disponibles
+              para visualizar la evolución.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="canvas-contenedor">
+            <canvas #graficaPeso></canvas>
+          </div>
+
+        }
+
+      </article>
+
+      <article class="tarjeta grafica">
+
+        <div class="cabecera-grafica">
+
+          <div>
+            <span class="etiqueta">
+              MEDIDAS
+            </span>
+
+            <h2>Evolución corporal</h2>
+
+            <p>
+              Comparación de las medidas registradas.
+            </p>
+          </div>
+
+        </div>
+
+        @if (medidas.length === 0) {
+
+          <div class="estado-grafica">
+
+            <h3>Sin medidas registradas</h3>
+
+            <p>
+              No hay medidas corporales disponibles
+              para visualizar esta gráfica.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="canvas-contenedor grande">
+            <canvas #graficaMedidas></canvas>
+          </div>
+
+        }
+
+      </article>
+
+    </section>
+
+  }
+
+</div>

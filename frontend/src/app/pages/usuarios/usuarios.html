@@ -1,0 +1,336 @@
+<div class="pagina">
+
+  <header class="encabezado">
+    <div>
+      <span class="seccion">
+        ADMINISTRACIÓN
+      </span>
+
+      <h1>Usuarios</h1>
+
+      <p>
+        Gestiona los roles y el estado de las
+        cuentas registradas.
+      </p>
+    </div>
+  </header>
+
+  @if (mensajeExito) {
+    <div class="alerta exito">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error">
+      {{ mensajeError }}
+    </div>
+  }
+
+  <section class="tarjeta filtros">
+
+    <div class="buscador">
+      <label>Buscar</label>
+
+      <input
+        type="text"
+        [(ngModel)]="busqueda"
+        (ngModelChange)="aplicarFiltros()"
+        placeholder="Nombre, usuario o correo">
+    </div>
+
+    <div class="campo-filtro">
+      <label>Rol</label>
+
+      <select
+        [(ngModel)]="filtroRol"
+        (ngModelChange)="aplicarFiltros()">
+
+        <option value="TODOS">
+          Todos
+        </option>
+
+        <option value="ADMIN">
+          Administrador
+        </option>
+
+        <option value="ENTRENADOR">
+          Entrenador
+        </option>
+
+        <option value="USUARIO">
+          Usuario
+        </option>
+
+      </select>
+    </div>
+
+    <div class="campo-filtro">
+      <label>Estado</label>
+
+      <select
+        [(ngModel)]="filtroEstado"
+        (ngModelChange)="aplicarFiltros()">
+
+        <option value="TODOS">
+          Todos
+        </option>
+
+        <option value="ACTIVO">
+          Activo
+        </option>
+
+        <option value="INACTIVO">
+          Inactivo
+        </option>
+
+      </select>
+    </div>
+
+  </section>
+
+  <section class="tarjeta listado">
+
+    <div class="cabecera-listado">
+      <div>
+        <h2>Usuarios registrados</h2>
+
+        <p>
+          {{ usuariosFiltrados.length }}
+          resultado(s)
+        </p>
+      </div>
+    </div>
+
+    @if (cargando) {
+
+      <div class="estado-vacio">
+        <h3>Cargando usuarios...</h3>
+      </div>
+
+    } @else if (usuariosFiltrados.length === 0) {
+
+      <div class="estado-vacio">
+        <h3>No se encontraron usuarios</h3>
+
+        <p>
+          Prueba con otros criterios de búsqueda.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="tabla-contenedor">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Nombre de usuario</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Fecha de registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (
+              usuario of usuariosFiltrados;
+              track usuario.id
+            ) {
+
+              <tr>
+
+                <td>
+                  <div class="usuario-info">
+
+                    <div class="avatar">
+                      {{
+                        iniciales(
+                          usuario.nombre_completo
+                        )
+                      }}
+                    </div>
+
+                    <div>
+                      <strong>
+                        {{ usuario.nombre_completo }}
+                      </strong>
+
+                      <span>
+                        {{ usuario.correo }}
+                      </span>
+                    </div>
+
+                  </div>
+                </td>
+
+                <td>
+                  {{ usuario.nombre_usuario }}
+                </td>
+
+                <td>
+                  <span
+                    class="rol"
+                    [class]="claseRol(usuario.rol)">
+                    {{ usuario.rol }}
+                  </span>
+                </td>
+
+                <td>
+                  <span
+                    class="estado"
+                    [class.inactivo]="
+                      usuario.estado === 'INACTIVO'
+                    ">
+                    {{ usuario.estado }}
+                  </span>
+                </td>
+
+                <td>
+                  {{
+                    usuario.fecha_creacion
+                      ? (
+                          usuario.fecha_creacion
+                          | slice:0:10
+                        )
+                      : '—'
+                  }}
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="abrirEdicion(usuario)">
+                    Administrar
+                  </button>
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+  </section>
+
+  @if (usuarioEditando) {
+
+    <div
+      class="fondo-modal"
+      (click)="cancelarEdicion()">
+
+      <section
+        class="modal"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-cabecera">
+
+          <div>
+            <span class="seccion">
+              ADMINISTRAR USUARIO
+            </span>
+
+            <h2>
+              {{ usuarioEditando.nombre_completo }}
+            </h2>
+
+            <p>
+              {{ usuarioEditando.correo }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="cerrar"
+            (click)="cancelarEdicion()">
+            ×
+          </button>
+
+        </div>
+
+        <div class="campo">
+
+          <label>Rol</label>
+
+          <select [(ngModel)]="rolSeleccionado">
+
+            <option value="ADMIN">
+              Administrador
+            </option>
+
+            <option value="ENTRENADOR">
+              Entrenador
+            </option>
+
+            <option value="USUARIO">
+              Usuario
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="campo">
+
+          <label>Estado de la cuenta</label>
+
+          <select [(ngModel)]="estadoSeleccionado">
+
+            <option value="ACTIVO">
+              Activo
+            </option>
+
+            <option value="INACTIVO">
+              Inactivo
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="advertencia">
+          Los cambios de rol modifican los permisos
+          disponibles para este usuario.
+        </div>
+
+        <div class="acciones-modal">
+
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="boton primario"
+            [disabled]="guardando"
+            (click)="guardarCambios()">
+            {{
+              guardando
+                ? 'Guardando...'
+                : 'Guardar cambios'
+            }}
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  }
+
+</div>

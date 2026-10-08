@@ -1,0 +1,336 @@
+<div class="pagina-membresia">
+
+  <header class="encabezado">
+    <div>
+      <p class="etiqueta">Membresía</p>
+
+      <h1>Mi membresía</h1>
+
+      <p>
+        Consulta tu plan actual, vigencia e historial de membresías.
+      </p>
+    </div>
+  </header>
+
+
+  @if (mensajeError) {
+
+    <div class="alerta-error">
+      {{ mensajeError }}
+    </div>
+
+  }
+
+
+  @if (cargando) {
+
+    <div class="estado-carga">
+
+      <div class="spinner"></div>
+
+      <div>
+        <strong>Cargando tu membresía</strong>
+
+        <p>
+          Consultando la información de tu plan.
+        </p>
+      </div>
+
+    </div>
+
+  } @else {
+
+
+    @if (membresiaActual) {
+
+      <section class="membresia-principal">
+
+        <div class="cabecera-plan">
+
+          <div>
+
+            <span class="subtitulo">
+              Plan actual
+            </span>
+
+            <h2>
+              {{ planActual?.nombre || 'Plan' }}
+            </h2>
+
+          </div>
+
+
+          <span class="estado estado-vigente">
+            VIGENTE
+          </span>
+
+        </div>
+
+
+        <div class="precio">
+          {{
+            formatearDinero(
+              membresiaActual.monto
+            )
+          }}
+        </div>
+
+
+        <p class="descripcion-plan">
+          {{
+            planActual?.descripcion
+            || 'Membresía activa del gimnasio.'
+          }}
+        </p>
+
+
+        <div class="datos-membresia">
+
+          <div class="dato">
+
+            <span>
+              Fecha de inicio
+            </span>
+
+            <strong>
+              {{
+                formatearFecha(
+                  membresiaActual.fecha_inicio
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="dato">
+
+            <span>
+              Fecha de vencimiento
+            </span>
+
+            <strong>
+              {{
+                formatearFecha(
+                  membresiaActual.fecha_fin
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="dato">
+
+            <span>
+              Duración del plan
+            </span>
+
+            <strong>
+              {{ planActual?.duracion_dias || 0 }}
+              días
+            </strong>
+
+          </div>
+
+
+          <div class="dato">
+
+            <span>
+              Tiempo restante
+            </span>
+
+            <strong>
+              {{ diasRestantes }}
+              {{
+                diasRestantes === 1
+                  ? 'día'
+                  : 'días'
+              }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        @if (diasRestantes <= 5) {
+
+          <div class="aviso-vencimiento">
+
+            <strong>
+              Tu membresía está próxima a vencer.
+            </strong>
+
+            <p>
+              Quedan {{ diasRestantes }}
+              {{
+                diasRestantes === 1
+                  ? 'día'
+                  : 'días'
+              }}
+              de vigencia. Consulta con la administración
+              para realizar la renovación.
+            </p>
+
+          </div>
+
+        }
+
+      </section>
+
+    } @else {
+
+      <section class="sin-membresia">
+
+        <div class="icono-sin-membresia">
+          M
+        </div>
+
+        <h2>
+          No tienes una membresía vigente
+        </h2>
+
+        <p>
+          Actualmente no tienes un plan activo.
+          Consulta con la administración del gimnasio
+          para registrar o renovar tu membresía.
+        </p>
+
+      </section>
+
+    }
+
+
+    @if (mensualidades.length > 0) {
+
+      <section class="historial">
+
+        <div class="historial-encabezado">
+
+          <div>
+
+            <h2>
+              Historial de membresías
+            </h2>
+
+            <p>
+              Consulta los planes que han sido registrados
+              en tu cuenta.
+            </p>
+
+          </div>
+
+
+          <span>
+            {{ mensualidades.length }}
+            {{
+              mensualidades.length === 1
+                ? 'registro'
+                : 'registros'
+            }}
+          </span>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Plan</th>
+                <th>Valor</th>
+                <th>Inicio</th>
+                <th>Finalización</th>
+                <th>Estado</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                mensualidad of mensualidades;
+                track mensualidad.id
+              ) {
+
+                <tr>
+
+                  <td>
+
+                    <strong class="nombre-plan">
+                      {{
+                        obtenerPlan(
+                          mensualidad.plan_id
+                        )?.nombre
+                        || 'Plan'
+                      }}
+                    </strong>
+
+                  </td>
+
+
+                  <td class="valor">
+                    {{
+                      formatearDinero(
+                        mensualidad.monto
+                      )
+                    }}
+                  </td>
+
+
+                  <td>
+                    {{
+                      formatearFecha(
+                        mensualidad.fecha_inicio
+                      )
+                    }}
+                  </td>
+
+
+                  <td>
+                    {{
+                      formatearFecha(
+                        mensualidad.fecha_fin
+                      )
+                    }}
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="estado"
+                      [class.estado-vigente]="
+                        mensualidad.estado === 'VIGENTE'
+                      "
+                      [class.estado-vencida]="
+                        mensualidad.estado === 'VENCIDA'
+                      "
+                    >
+                      {{ mensualidad.estado }}
+                    </span>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    }
+
+  }
+
+</div>

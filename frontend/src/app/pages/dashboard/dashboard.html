@@ -1,0 +1,837 @@
+@if (cargando) {
+
+  <section class="estado-pagina">
+
+    <div class="cargando-circulo">
+      <span></span>
+    </div>
+
+    <h2>Cargando tu espacio</h2>
+
+    <p>
+      Estamos preparando la información de tu cuenta.
+    </p>
+
+  </section>
+
+} @else if (mensajeError) {
+
+  <section class="estado-pagina error">
+
+    <h2>No fue posible cargar el inicio</h2>
+
+    <p>
+      {{ mensajeError }}
+    </p>
+
+  </section>
+
+} @else if (usuario) {
+
+  <div class="dashboard">
+
+    <section class="bienvenida">
+
+      <span class="etiqueta-bienvenida">
+        TU ESPACIO DE ENTRENAMIENTO
+      </span>
+
+      <h1>
+        Hola, {{ nombreCorto }}
+      </h1>
+
+      <p>
+        ¿Qué quieres hacer hoy?
+      </p>
+
+    </section>
+
+
+    @if (usuario.rol === 'USUARIO') {
+
+      <section class="mapa mapa-usuario">
+
+        <!-- EJERCICIOS -->
+
+        <button
+          class="acceso acceso-ejercicios"
+          type="button"
+          (click)="irA('/ejercicios')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M10 24v16" />
+              <path d="M16 20v24" />
+              <path d="M48 20v24" />
+              <path d="M54 24v16" />
+              <path d="M16 32h32" />
+
+            </svg>
+
+          </span>
+
+          <strong>Ejercicios</strong>
+
+          <small>
+            Explora el catálogo
+          </small>
+
+        </button>
+
+
+        <!-- RUTINAS -->
+
+        <button
+          class="acceso acceso-rutinas"
+          type="button"
+          (click)="irA('/rutinas')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <rect
+                x="16"
+                y="12"
+                width="32"
+                height="40"
+                rx="5">
+              </rect>
+
+              <path d="M23 23h18" />
+              <path d="M23 32h18" />
+              <path d="M23 41h12" />
+
+              <path d="M27 12v-2h10v2" />
+
+            </svg>
+
+          </span>
+
+          <strong>Rutinas</strong>
+
+          <small>
+            Organiza tu entrenamiento
+          </small>
+
+        </button>
+
+
+        <!-- ENTRENAMIENTOS -->
+
+        <button
+          class="acceso acceso-entrenamientos"
+          type="button"
+          (click)="irA('/entrenamientos')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M24 15h16" />
+              <path d="M28 10h8" />
+
+              <rect
+                x="18"
+                y="15"
+                width="28"
+                height="38"
+                rx="6">
+              </rect>
+
+              <path d="M25 26h14" />
+              <path d="M25 34h14" />
+              <path d="M25 42h8" />
+
+            </svg>
+
+          </span>
+
+          <strong>Entrenamientos</strong>
+
+          <small>
+            Registra tus sesiones
+          </small>
+
+        </button>
+
+
+        <!-- PROGRESO -->
+
+        <button
+          class="acceso acceso-progreso"
+          type="button"
+          (click)="irA('/progreso')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M14 48V35" />
+              <path d="M26 48V27" />
+              <path d="M38 48V19" />
+              <path d="M50 48V12" />
+
+              <path d="M12 52h42" />
+
+            </svg>
+
+          </span>
+
+          <strong>Progreso</strong>
+
+          <small>
+            Revisa tu evolución
+          </small>
+
+        </button>
+
+
+        <!-- OBJETIVOS -->
+
+        <button
+          class="acceso acceso-objetivos"
+          type="button"
+          (click)="irA('/objetivos')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <circle
+                cx="32"
+                cy="32"
+                r="20">
+              </circle>
+
+              <circle
+                cx="32"
+                cy="32"
+                r="12">
+              </circle>
+
+              <circle
+                cx="32"
+                cy="32"
+                r="4">
+              </circle>
+
+              <path d="M44 20l8-8" />
+              <path d="M45 12h7v7" />
+
+            </svg>
+
+          </span>
+
+          <strong>Objetivos</strong>
+
+          <small>
+            Define tus metas
+          </small>
+
+        </button>
+
+
+        <!-- MEDIDAS -->
+
+        <button
+          class="acceso acceso-medidas"
+          type="button"
+          (click)="irA('/medidas')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path
+                d="
+                  M18 22
+                  c8-7 20-7 28 0
+                ">
+              </path>
+
+              <path
+                d="
+                  M18 42
+                  c8 7 20 7 28 0
+                ">
+              </path>
+
+              <path d="M22 18v28" />
+              <path d="M42 18v28" />
+
+              <path d="M27 25h10" />
+              <path d="M27 32h10" />
+              <path d="M27 39h10" />
+
+            </svg>
+
+          </span>
+
+          <strong>Medidas corporales</strong>
+
+          <small>
+            Lleva tu seguimiento
+          </small>
+
+        </button>
+
+
+        <!-- MEMBRESÍA -->
+
+        <button
+          class="acceso acceso-membresia"
+          type="button"
+          (click)="irA('/mi-membresia')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <rect
+                x="12"
+                y="17"
+                width="40"
+                height="30"
+                rx="6">
+              </rect>
+
+              <path d="M12 26h40" />
+
+              <path d="M20 36h11" />
+
+              <circle
+                cx="43"
+                cy="36"
+                r="4">
+              </circle>
+
+            </svg>
+
+          </span>
+
+          <strong>Mi membresía</strong>
+
+          <small>
+            Consulta tu plan
+          </small>
+
+        </button>
+
+      </section>
+
+    }
+
+
+    @if (usuario.rol === 'ENTRENADOR') {
+
+      <section class="mapa mapa-entrenador">
+
+        <!-- EJERCICIOS -->
+
+        <button
+          class="acceso acceso-ejercicios"
+          type="button"
+          (click)="irA('/ejercicios')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M10 24v16" />
+              <path d="M16 20v24" />
+              <path d="M48 20v24" />
+              <path d="M54 24v16" />
+              <path d="M16 32h32" />
+
+            </svg>
+
+          </span>
+
+          <strong>Ejercicios</strong>
+
+          <small>
+            Gestiona el catálogo
+          </small>
+
+        </button>
+
+
+        <!-- RUTINAS -->
+
+        <button
+          class="acceso acceso-rutinas"
+          type="button"
+          (click)="irA('/rutinas')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <rect
+                x="16"
+                y="12"
+                width="32"
+                height="40"
+                rx="5">
+              </rect>
+
+              <path d="M23 23h18" />
+              <path d="M23 32h18" />
+              <path d="M23 41h12" />
+              <path d="M27 12v-2h10v2" />
+
+            </svg>
+
+          </span>
+
+          <strong>Rutinas</strong>
+
+          <small>
+            Organiza entrenamientos
+          </small>
+
+        </button>
+
+
+        <!-- ENTRENAMIENTOS -->
+
+        <button
+          class="acceso acceso-entrenamientos"
+          type="button"
+          (click)="irA('/entrenamientos')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M24 15h16" />
+              <path d="M28 10h8" />
+
+              <rect
+                x="18"
+                y="15"
+                width="28"
+                height="38"
+                rx="6">
+              </rect>
+
+              <path d="M25 26h14" />
+              <path d="M25 34h14" />
+              <path d="M25 42h8" />
+
+            </svg>
+
+          </span>
+
+          <strong>Entrenamientos</strong>
+
+          <small>
+            Gestiona sesiones
+          </small>
+
+        </button>
+
+
+        <!-- PROGRESO -->
+
+        <button
+          class="acceso acceso-progreso"
+          type="button"
+          (click)="irA('/progreso')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M14 48V35" />
+              <path d="M26 48V27" />
+              <path d="M38 48V19" />
+              <path d="M50 48V12" />
+
+              <path d="M12 52h42" />
+
+            </svg>
+
+          </span>
+
+          <strong>Progreso</strong>
+
+          <small>
+            Consulta la evolución
+          </small>
+
+        </button>
+
+
+        <!-- OBJETIVOS -->
+
+        <button
+          class="acceso acceso-objetivos"
+          type="button"
+          (click)="irA('/objetivos')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <circle
+                cx="32"
+                cy="32"
+                r="20">
+              </circle>
+
+              <circle
+                cx="32"
+                cy="32"
+                r="12">
+              </circle>
+
+              <circle
+                cx="32"
+                cy="32"
+                r="4">
+              </circle>
+
+              <path d="M44 20l8-8" />
+              <path d="M45 12h7v7" />
+
+            </svg>
+
+          </span>
+
+          <strong>Objetivos</strong>
+
+          <small>
+            Gestiona las metas
+          </small>
+
+        </button>
+
+
+        <!-- MEDIDAS -->
+
+        <button
+          class="acceso acceso-medidas"
+          type="button"
+          (click)="irA('/medidas')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path
+                d="
+                  M18 22
+                  c8-7 20-7 28 0
+                ">
+              </path>
+
+              <path
+                d="
+                  M18 42
+                  c8 7 20 7 28 0
+                ">
+              </path>
+
+              <path d="M22 18v28" />
+              <path d="M42 18v28" />
+
+              <path d="M27 25h10" />
+              <path d="M27 32h10" />
+              <path d="M27 39h10" />
+
+            </svg>
+
+          </span>
+
+          <strong>Medidas corporales</strong>
+
+          <small>
+            Consulta registros
+          </small>
+
+        </button>
+
+
+        <!-- MIS USUARIOS -->
+
+        <button
+          class="acceso acceso-usuarios"
+          type="button"
+          (click)="irA('/mis-usuarios')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <circle
+                cx="25"
+                cy="24"
+                r="8">
+              </circle>
+
+              <circle
+                cx="43"
+                cy="27"
+                r="6">
+              </circle>
+
+              <path
+                d="
+                  M11 49
+                  c2-9 8-13 14-13
+                  s12 4 14 13
+                ">
+              </path>
+
+              <path
+                d="
+                  M38 39
+                  c7 0 12 4 14 10
+                ">
+              </path>
+
+            </svg>
+
+          </span>
+
+          <strong>Mis usuarios</strong>
+
+          <small>
+            Gestiona tus asignados
+          </small>
+
+        </button>
+
+      </section>
+
+    }
+
+
+    @if (usuario.rol === 'ADMIN') {
+
+      <section class="mapa mapa-admin">
+
+        <!-- EJERCICIOS -->
+
+        <button
+          class="acceso acceso-ejercicios"
+          type="button"
+          (click)="irA('/ejercicios')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <path d="M10 24v16" />
+              <path d="M16 20v24" />
+              <path d="M48 20v24" />
+              <path d="M54 24v16" />
+              <path d="M16 32h32" />
+
+            </svg>
+
+          </span>
+
+          <strong>Ejercicios</strong>
+
+          <small>
+            Gestiona el catálogo
+          </small>
+
+        </button>
+
+
+        <!-- USUARIOS -->
+
+        <button
+          class="acceso acceso-usuarios"
+          type="button"
+          (click)="irA('/usuarios')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <circle
+                cx="25"
+                cy="24"
+                r="8">
+              </circle>
+
+              <circle
+                cx="43"
+                cy="27"
+                r="6">
+              </circle>
+
+              <path
+                d="
+                  M11 49
+                  c2-9 8-13 14-13
+                  s12 4 14 13
+                ">
+              </path>
+
+              <path
+                d="
+                  M38 39
+                  c7 0 12 4 14 10
+                ">
+              </path>
+
+            </svg>
+
+          </span>
+
+          <strong>Usuarios</strong>
+
+          <small>
+            Administra las cuentas
+          </small>
+
+        </button>
+
+
+        <!-- ASIGNACIONES -->
+
+        <button
+          class="acceso acceso-asignaciones"
+          type="button"
+          (click)="irA('/asignaciones')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <circle
+                cx="20"
+                cy="22"
+                r="7">
+              </circle>
+
+              <circle
+                cx="44"
+                cy="22"
+                r="7">
+              </circle>
+
+              <path
+                d="
+                  M8 47
+                  c2-9 7-13 12-13
+                  s10 4 12 13
+                ">
+              </path>
+
+              <path
+                d="
+                  M32 47
+                  c2-9 7-13 12-13
+                  s10 4 12 13
+                ">
+              </path>
+
+              <path d="M27 26h10" />
+              <path d="M34 22l4 4-4 4" />
+
+            </svg>
+
+          </span>
+
+          <strong>Asignaciones</strong>
+
+          <small>
+            Entrenadores y usuarios
+          </small>
+
+        </button>
+
+
+        <!-- MENSUALIDADES -->
+
+        <button
+          class="acceso acceso-membresia"
+          type="button"
+          (click)="irA('/mensualidades')">
+
+          <span class="circulo">
+
+            <svg
+              viewBox="0 0 64 64"
+              aria-hidden="true">
+
+              <rect
+                x="12"
+                y="17"
+                width="40"
+                height="30"
+                rx="6">
+              </rect>
+
+              <path d="M12 26h40" />
+
+              <path d="M20 36h11" />
+
+              <circle
+                cx="43"
+                cy="36"
+                r="4">
+              </circle>
+
+            </svg>
+
+          </span>
+
+          <strong>Mensualidades</strong>
+
+          <small>
+            Control de pagos
+          </small>
+
+        </button>
+
+      </section>
+
+    }
+
+  </div>
+
+}

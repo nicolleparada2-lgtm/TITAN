@@ -1,0 +1,275 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+    <span class="seccion">ADMINISTRACIÓN</span>
+
+    <h1>Asignaciones</h1>
+
+    <p>
+      Asigna usuarios a los entrenadores responsables
+      de su seguimiento.
+    </p>
+  </header>
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  <section class="tarjeta nueva-asignacion">
+
+    <div class="titulo-tarjeta">
+      <h2>Nueva asignación</h2>
+      <p>
+        Selecciona el entrenador y el usuario que
+        deseas relacionar.
+      </p>
+    </div>
+
+    <div class="formulario">
+
+      <div class="campo">
+        <label for="entrenador">Entrenador</label>
+
+        <select
+          id="entrenador"
+          [(ngModel)]="entrenadorId">
+
+          <option [ngValue]="null">
+            Selecciona un entrenador
+          </option>
+
+          @for (entrenador of entrenadores; track entrenador.id) {
+            <option [ngValue]="entrenador.id">
+              {{ entrenador.nombre_completo }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="usuario">Usuario</label>
+
+        <select
+          id="usuario"
+          [(ngModel)]="usuarioId">
+
+          <option [ngValue]="null">
+            Selecciona un usuario
+          </option>
+
+          @for (usuario of usuariosDisponibles; track usuario.id) {
+            <option [ngValue]="usuario.id">
+              {{ usuario.nombre_completo }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="boton-asignar"
+        [disabled]="guardando || cargando"
+        (click)="crearAsignacion()">
+        {{ guardando ? 'Asignando...' : 'Asignar usuario' }}
+      </button>
+
+    </div>
+
+  </section>
+
+  <section class="tarjeta listado">
+
+    <div class="cabecera-listado">
+      <div>
+        <h2>Asignaciones actuales</h2>
+        <p>
+          {{ asignaciones.length }}
+          asignación(es)
+        </p>
+      </div>
+    </div>
+
+    @if (cargando) {
+
+      <div class="estado-vacio">
+        <h3>Cargando asignaciones...</h3>
+      </div>
+
+    } @else if (asignaciones.length === 0) {
+
+      <div class="estado-vacio">
+        <h3>No hay asignaciones</h3>
+        <p>
+          Asigna un usuario a un entrenador
+          para comenzar.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="lista-asignaciones">
+
+        @for (asignacion of asignaciones; track asignacion.id) {
+
+          <article class="asignacion">
+
+            <div class="persona">
+
+              <div class="avatar entrenador">
+                {{ iniciales(asignacion.entrenador_id) }}
+              </div>
+
+              <div>
+                <span class="tipo">ENTRENADOR</span>
+
+                <strong>
+                  {{ nombreUsuario(asignacion.entrenador_id) }}
+                </strong>
+
+                <small>
+                  {{ correoUsuario(asignacion.entrenador_id) }}
+                </small>
+              </div>
+
+            </div>
+
+            <div class="conexion">
+              <span>asignado a</span>
+              <div class="linea"></div>
+            </div>
+
+            <div class="persona">
+
+              <div class="avatar usuario">
+                {{ iniciales(asignacion.usuario_id) }}
+              </div>
+
+              <div>
+                <span class="tipo">USUARIO</span>
+
+                <strong>
+                  {{ nombreUsuario(asignacion.usuario_id) }}
+                </strong>
+
+                <small>
+                  {{ correoUsuario(asignacion.usuario_id) }}
+                </small>
+              </div>
+
+            </div>
+
+            <div class="datos-asignacion">
+              <span>Asignado</span>
+
+              <strong>
+                {{ formatearFecha(asignacion.fecha_asignacion) }}
+              </strong>
+            </div>
+
+            <button
+              type="button"
+              class="eliminar"
+              (click)="eliminarAsignacion(asignacion)">
+              Eliminar
+            </button>
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+</div>
+
+@if (asignacionPorEliminar; as asignacion) {
+  <div class="modal-fondo">
+
+    <section
+      class="modal-confirmacion"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-titulo"
+      aria-describedby="modal-descripcion">
+
+      <div class="modal-superior">
+
+        <div class="modal-icono" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M17 8h6"></path>
+          </svg>
+        </div>
+
+        <button
+          type="button"
+          class="modal-cerrar"
+          aria-label="Cerrar confirmación"
+          [disabled]="eliminando"
+          (click)="cancelarEliminacion()">
+          ×
+        </button>
+
+      </div>
+
+      <h2 id="modal-titulo">
+        ¿Eliminar asignación?
+      </h2>
+
+      <p id="modal-descripcion" class="modal-descripcion">
+        ¿Deseas retirar a
+        <strong>{{ nombreUsuario(asignacion.usuario_id) }}</strong>
+        de los usuarios asignados a
+        <strong>{{ nombreUsuario(asignacion.entrenador_id) }}</strong>?
+      </p>
+
+      <p class="modal-advertencia">
+        Las cuentas no se eliminarán. Solo se quitará
+        la relación entre el entrenador y el usuario.
+      </p>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton-modal modal-cancelar"
+          [disabled]="eliminando"
+          (click)="cancelarEliminacion()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton-modal modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarEliminacion()">
+          {{ eliminando ? 'Eliminando...' : 'Eliminar asignación' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+}

@@ -1,0 +1,394 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <span class="seccion">
+        {{ esSeguimiento ? 'SEGUIMIENTO' : 'SEGUIMIENTO CORPORAL' }}
+      </span>
+
+      <h1>Medidas corporales</h1>
+
+      <p>{{ descripcionPagina }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="boton primario"
+      (click)="abrirFormulario()">
+      + Nueva medición
+    </button>
+
+  </header>
+
+  @if (esSeguimiento && usuarioSeguimiento) {
+
+    <div class="alerta seguimiento">
+
+      <div>
+        <strong>
+          Seguimiento de {{ usuarioSeguimiento.nombre_completo }}
+        </strong>
+
+        <span>
+          &#64;{{ usuarioSeguimiento.nombre_usuario }}
+          · Estás administrando sus medidas corporales como entrenador.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="volverMisUsuarios()">
+        Volver a mis usuarios
+      </button>
+
+    </div>
+
+  }
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (mostrarFormulario) {
+
+    <section class="tarjeta formulario">
+
+      <div class="cabecera-formulario">
+
+        <div>
+          <h2>{{ editando ? 'Editar medición' : 'Nueva medición' }}</h2>
+
+          <p>
+            Puedes registrar solamente las medidas que tengas disponibles.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="cerrar"
+          aria-label="Cerrar formulario"
+          (click)="cancelar()">
+          ×
+        </button>
+
+      </div>
+
+      <form (ngSubmit)="guardarMedida()">
+
+        <div class="campo fecha">
+
+          <label for="fechaMedicion">Fecha de medición</label>
+
+          <input
+            id="fechaMedicion"
+            type="date"
+            name="fechaMedicion"
+            [(ngModel)]="fechaMedicion">
+
+        </div>
+
+        <h3 class="subtitulo">Datos generales</h3>
+
+        <div class="grid">
+
+          <div class="campo">
+            <label for="peso">Peso (kg)</label>
+
+            <input
+              id="peso"
+              type="number"
+              name="peso"
+              min="0"
+              step="0.01"
+              [(ngModel)]="peso"
+              placeholder="Ej. 70.50">
+          </div>
+
+          <div class="campo">
+            <label for="altura">Altura (cm)</label>
+
+            <input
+              id="altura"
+              type="number"
+              name="altura"
+              min="0"
+              step="0.01"
+              [(ngModel)]="altura"
+              placeholder="Ej. 170">
+          </div>
+
+        </div>
+
+        <h3 class="subtitulo">Medidas en centímetros</h3>
+
+        <div class="grid medidas-grid">
+
+          <div class="campo">
+            <label for="pecho">Pecho</label>
+            <input id="pecho" type="number" name="pecho" min="0" step="0.01" [(ngModel)]="pecho">
+          </div>
+
+          <div class="campo">
+            <label for="cintura">Cintura</label>
+            <input id="cintura" type="number" name="cintura" min="0" step="0.01" [(ngModel)]="cintura">
+          </div>
+
+          <div class="campo">
+            <label for="cadera">Cadera</label>
+            <input id="cadera" type="number" name="cadera" min="0" step="0.01" [(ngModel)]="cadera">
+          </div>
+
+          <div class="campo">
+            <label for="brazoIzquierdo">Brazo izquierdo</label>
+            <input id="brazoIzquierdo" type="number" name="brazoIzquierdo" min="0" step="0.01" [(ngModel)]="brazoIzquierdo">
+          </div>
+
+          <div class="campo">
+            <label for="brazoDerecho">Brazo derecho</label>
+            <input id="brazoDerecho" type="number" name="brazoDerecho" min="0" step="0.01" [(ngModel)]="brazoDerecho">
+          </div>
+
+          <div class="campo">
+            <label for="musloIzquierdo">Muslo izquierdo</label>
+            <input id="musloIzquierdo" type="number" name="musloIzquierdo" min="0" step="0.01" [(ngModel)]="musloIzquierdo">
+          </div>
+
+          <div class="campo">
+            <label for="musloDerecho">Muslo derecho</label>
+            <input id="musloDerecho" type="number" name="musloDerecho" min="0" step="0.01" [(ngModel)]="musloDerecho">
+          </div>
+
+        </div>
+
+        <div class="acciones-formulario">
+
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="cancelar()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="boton primario"
+            [disabled]="guardando">
+            {{
+              guardando
+                ? 'Guardando...'
+                : editando
+                  ? 'Guardar cambios'
+                  : 'Registrar medición'
+            }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  }
+
+  <section class="tarjeta historial">
+
+    <div class="cabecera-historial">
+
+      <div>
+        <h2>
+          {{
+            esSeguimiento && usuarioSeguimiento
+              ? 'Mediciones de ' + usuarioSeguimiento.nombre_completo
+              : 'Historial de mediciones'
+          }}
+        </h2>
+
+        <p>{{ medidas.length }} registro(s)</p>
+      </div>
+
+    </div>
+
+    @if (cargando) {
+
+      <div class="estado-vacio">
+        <h3>Cargando mediciones...</h3>
+      </div>
+
+    } @else if (medidas.length === 0) {
+
+      <div class="estado-vacio">
+
+        <div class="icono">M</div>
+
+        <h3>No hay mediciones registradas</h3>
+
+        <p>
+          {{
+            esSeguimiento
+              ? 'Este usuario todavía no tiene mediciones corporales.'
+              : 'Registra tu primera medición corporal para comenzar el seguimiento.'
+          }}
+        </p>
+
+      </div>
+
+    } @else {
+
+      <div class="tabla-contenedor">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Peso</th>
+              <th>Altura</th>
+              <th>Pecho</th>
+              <th>Cintura</th>
+              <th>Cadera</th>
+              <th>Brazo I.</th>
+              <th>Brazo D.</th>
+              <th>Muslo I.</th>
+              <th>Muslo D.</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (medida of medidas; track medida.id) {
+
+              <tr>
+
+                <td>
+                  <strong>
+                    {{ formatearFecha(medida.fecha_medicion) }}
+                  </strong>
+                </td>
+
+                <td>{{ medida.peso !== null ? medida.peso + ' kg' : '—' }}</td>
+                <td>{{ medida.altura !== null ? medida.altura + ' cm' : '—' }}</td>
+                <td>{{ medida.pecho !== null ? medida.pecho + ' cm' : '—' }}</td>
+                <td>{{ medida.cintura !== null ? medida.cintura + ' cm' : '—' }}</td>
+                <td>{{ medida.cadera !== null ? medida.cadera + ' cm' : '—' }}</td>
+                <td>{{ medida.brazo_izquierdo !== null ? medida.brazo_izquierdo + ' cm' : '—' }}</td>
+                <td>{{ medida.brazo_derecho !== null ? medida.brazo_derecho + ' cm' : '—' }}</td>
+                <td>{{ medida.muslo_izquierdo !== null ? medida.muslo_izquierdo + ' cm' : '—' }}</td>
+                <td>{{ medida.muslo_derecho !== null ? medida.muslo_derecho + ' cm' : '—' }}</td>
+
+                <td>
+                  <div class="acciones">
+
+                    <button
+                      type="button"
+                      (click)="editarMedida(medida)">
+                      Editar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="eliminar"
+                      (click)="eliminarMedida(medida)">
+                      Eliminar
+                    </button>
+
+                  </div>
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+  </section>
+
+</div>
+
+@if (medidaPorEliminar; as medida) {
+
+  <div
+    class="modal-fondo"
+    (click)="cerrarConfirmacion()">
+
+    <section
+      class="modal-confirmacion"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-eliminar-medida"
+      aria-describedby="descripcion-eliminar-medida"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-icono">!</div>
+
+      <span class="modal-etiqueta">
+        CONFIRMAR ELIMINACIÓN
+      </span>
+
+      <h2 id="titulo-eliminar-medida">
+        ¿Eliminar medición?
+      </h2>
+
+      <p id="descripcion-eliminar-medida">
+        ¿Deseas eliminar la medición registrada el
+        <strong>{{ formatearFecha(medida.fecha_medicion) }}</strong>?
+      </p>
+
+      <div class="modal-detalle">
+
+        <span>Fecha de medición</span>
+        <strong>{{ formatearFecha(medida.fecha_medicion) }}</strong>
+
+        @if (medida.peso !== null) {
+          <span>Peso registrado</span>
+          <strong>{{ medida.peso }} kg</strong>
+        }
+
+      </div>
+
+      <p class="modal-advertencia">
+        Esta acción eliminará únicamente esta medición del historial.
+        No se puede deshacer.
+      </p>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton secundario"
+          [disabled]="eliminando"
+          (click)="cerrarConfirmacion()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarEliminacion()">
+          {{ eliminando ? 'Eliminando...' : 'Eliminar medición' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}

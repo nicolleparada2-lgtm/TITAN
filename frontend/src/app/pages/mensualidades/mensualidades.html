@@ -1,0 +1,511 @@
+
+<div class="pagina-mensualidades">
+
+  <header class="encabezado">
+    <div>
+      <p class="etiqueta-seccion">Administración</p>
+      <h1>Mensualidades</h1>
+      <p class="descripcion">
+        Gestiona los planes y periodos de membresía de los usuarios.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-principal"
+      (click)="abrirFormulario()">
+      Nueva mensualidad
+    </button>
+  </header>
+
+  @if (mensajeExito) {
+    <div class="alerta alerta-exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError && !mostrarFormulario && !mensualidadPorEliminar) {
+    <div class="alerta alerta-error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (cargando) {
+    <div class="estado-carga">
+      <div class="spinner"></div>
+      <div>
+        <strong>Cargando mensualidades</strong>
+        <p>Consultando la información de membresías.</p>
+      </div>
+    </div>
+  } @else {
+
+    <section class="resumen">
+      <article class="tarjeta-resumen">
+        <div class="icono-resumen icono-vigente">✓</div>
+        <div>
+          <span>Mensualidades vigentes</span>
+          <strong>{{ totalVigentes }}</strong>
+        </div>
+      </article>
+
+      <article class="tarjeta-resumen">
+        <div class="icono-resumen icono-proximo">!</div>
+        <div>
+          <span>Próximas a vencer</span>
+          <strong>{{ totalPorVencer }}</strong>
+        </div>
+      </article>
+
+      <article class="tarjeta-resumen">
+        <div class="icono-resumen icono-vencido">×</div>
+        <div>
+          <span>Mensualidades vencidas</span>
+          <strong>{{ totalVencidas }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel-listado">
+
+      <div class="cabecera-listado">
+        <div>
+          <h2>Registro de mensualidades</h2>
+          <p>Consulta el plan, vigencia y estado de cada membresía.</p>
+        </div>
+
+        <span class="contador">
+          {{ mensualidadesFiltradas.length }} registros
+        </span>
+      </div>
+
+      <div class="filtros">
+
+        <div class="campo-busqueda">
+          <label for="buscarMensualidad">Buscar</label>
+          <input
+            id="buscarMensualidad"
+            type="text"
+            [(ngModel)]="busqueda"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Nombre, usuario o plan">
+        </div>
+
+        <div class="campo-filtro">
+          <label for="filtroEstado">Estado</label>
+          <select
+            id="filtroEstado"
+            [(ngModel)]="filtroEstado"
+            (ngModelChange)="aplicarFiltros()">
+            <option value="TODOS">Todos</option>
+            <option value="VIGENTE">Vigentes</option>
+            <option value="VENCIDA">Vencidas</option>
+          </select>
+        </div>
+
+      </div>
+
+      @if (mensualidadesFiltradas.length === 0) {
+        <div class="estado-vacio">
+          <div class="icono-vacio">$</div>
+          <h3>No hay mensualidades para mostrar</h3>
+          <p>
+            No se encontraron registros con los filtros seleccionados.
+          </p>
+        </div>
+      } @else {
+
+        <div class="tabla-contenedor">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Plan</th>
+                <th>Valor</th>
+                <th>Inicio</th>
+                <th>Finalización</th>
+                <th>Estado</th>
+                <th class="columna-acciones">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (mensualidad of mensualidadesFiltradas; track mensualidad.id) {
+                <tr>
+
+                  <td>
+                    <div class="usuario-tabla">
+                      <div class="avatar">
+                        {{
+                          obtenerUsuario(mensualidad.usuario_id)
+                            ?.nombre_completo?.charAt(0) || 'U'
+                        }}
+                      </div>
+
+                      <div>
+                        <strong>
+                          {{
+                            obtenerUsuario(mensualidad.usuario_id)
+                              ?.nombre_completo || 'Usuario'
+                          }}
+                        </strong>
+                        <span>
+                          @{{
+                            obtenerUsuario(mensualidad.usuario_id)
+                              ?.nombre_usuario || 'usuario'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="plan-tabla">
+                      <strong>
+                        {{
+                          obtenerPlan(mensualidad.plan_id)?.nombre || 'Plan'
+                        }}
+                      </strong>
+                      <span>
+                        {{
+                          obtenerPlan(mensualidad.plan_id)?.duracion_dias || 0
+                        }} días
+                      </span>
+                    </div>
+                  </td>
+
+                  <td class="valor">
+                    {{ formatearDinero(mensualidad.monto) }}
+                  </td>
+
+                  <td>
+                    {{ formatearFecha(mensualidad.fecha_inicio) }}
+                  </td>
+
+                  <td>
+                    {{ formatearFecha(mensualidad.fecha_fin) }}
+                  </td>
+
+                  <td>
+                    <span
+                      class="estado"
+                      [class.estado-vigente]="mensualidad.estado === 'VIGENTE'"
+                      [class.estado-vencida]="mensualidad.estado === 'VENCIDA'">
+                      {{ mensualidad.estado }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <div class="acciones">
+                      <button
+                        type="button"
+                        class="btn-secundario"
+                        (click)="editarMensualidad(mensualidad)">
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn-eliminar"
+                        (click)="eliminarMensualidad(mensualidad)">
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      }
+
+    </section>
+  }
+
+  <!-- Formulario de registro y edición -->
+
+  @if (mostrarFormulario) {
+    <div class="modal-fondo" (click)="cerrarFormulario()">
+
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloFormulario"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-encabezado">
+          <div>
+            <span class="modal-etiqueta">
+              {{
+                mensualidadEditando
+                  ? 'Editar registro'
+                  : 'Nueva membresía'
+              }}
+            </span>
+
+            <h2 id="tituloFormulario">
+              {{
+                mensualidadEditando
+                  ? 'Editar mensualidad'
+                  : 'Registrar mensualidad'
+              }}
+            </h2>
+
+            <p>
+              Selecciona el usuario, el plan y la fecha de inicio.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn-cerrar"
+            aria-label="Cerrar formulario"
+            [disabled]="guardando"
+            (click)="cerrarFormulario()">
+            ×
+          </button>
+        </div>
+
+        @if (mensajeError) {
+          <div class="alerta alerta-error" role="alert">
+            {{ mensajeError }}
+          </div>
+        }
+
+        <div class="formulario">
+
+          <div class="campo">
+            <label for="usuarioMensualidad">Usuario</label>
+
+            <select
+              id="usuarioMensualidad"
+              [(ngModel)]="usuarioId"
+              [disabled]="mensualidadEditando !== null">
+
+              <option [ngValue]="null">
+                Selecciona un usuario
+              </option>
+
+              @for (usuario of usuarios; track usuario.id) {
+                <option [ngValue]="usuario.id">
+                  {{ usuario.nombre_completo }}
+                  — @{{ usuario.nombre_usuario }}
+                </option>
+              }
+            </select>
+
+            @if (mensualidadEditando) {
+              <small>
+                El usuario no puede cambiarse al editar una mensualidad.
+              </small>
+            }
+          </div>
+
+          <div class="campo">
+            <label for="planMensualidad">Plan</label>
+
+            <select
+              id="planMensualidad"
+              [(ngModel)]="planId">
+
+              <option [ngValue]="null">
+                Selecciona un plan
+              </option>
+
+              @for (plan of planes; track plan.id) {
+                <option [ngValue]="plan.id">
+                  {{ plan.nombre }} — {{ formatearDinero(plan.precio) }}
+                </option>
+              }
+            </select>
+          </div>
+
+          @if (planSeleccionado; as plan) {
+            <div class="detalle-plan">
+
+              <div class="detalle-plan-cabecera">
+                <div>
+                  <span>Plan seleccionado</span>
+                  <h3>{{ plan.nombre }}</h3>
+                </div>
+
+                <strong>
+                  {{ formatearDinero(plan.precio) }}
+                </strong>
+              </div>
+
+              <p>{{ plan.descripcion }}</p>
+
+              <div class="dato-plan">
+                <span>Duración</span>
+                <strong>{{ plan.duracion_dias }} días</strong>
+              </div>
+
+            </div>
+          }
+
+          <div class="fila-fechas">
+
+            <div class="campo">
+              <label for="fechaInicio">Fecha de inicio</label>
+              <input
+                id="fechaInicio"
+                type="date"
+                [(ngModel)]="fechaInicio">
+            </div>
+
+            <div class="campo">
+              <label>Fecha de finalización</label>
+
+              <div class="fecha-calculada">
+                {{
+                  fechaFinCalculada === '—'
+                    ? 'Se calculará automáticamente'
+                    : formatearFecha(fechaFinCalculada)
+                }}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="aviso">
+            El valor y la fecha de finalización se calculan
+            automáticamente de acuerdo con el plan seleccionado.
+          </div>
+
+        </div>
+
+        <div class="modal-acciones">
+
+          <button
+            type="button"
+            class="btn-cancelar"
+            [disabled]="guardando"
+            (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-principal"
+            [disabled]="guardando"
+            (click)="guardarMensualidad()">
+            {{
+              guardando
+                ? 'Guardando...'
+                : mensualidadEditando
+                  ? 'Guardar cambios'
+                  : 'Registrar mensualidad'
+            }}
+          </button>
+
+        </div>
+
+      </section>
+    </div>
+  }
+
+  <!-- Confirmación personalizada de eliminación -->
+
+  @if (mensualidadPorEliminar; as mensualidad) {
+    <div class="modal-fondo" (click)="cerrarConfirmacion()">
+
+      <section
+        class="modal modal-confirmacion"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="tituloEliminarMensualidad"
+        aria-describedby="descripcionEliminarMensualidad"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-encabezado">
+
+          <div>
+            <span class="modal-etiqueta">
+              Confirmar eliminación
+            </span>
+
+            <h2 id="tituloEliminarMensualidad">
+              ¿Eliminar mensualidad?
+            </h2>
+
+            <p id="descripcionEliminarMensualidad">
+              ¿Deseas eliminar la mensualidad de
+              <strong>{{ nombreUsuarioPorEliminar }}</strong>?
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn-cerrar"
+            aria-label="Cerrar confirmación"
+            [disabled]="eliminando"
+            (click)="cerrarConfirmacion()">
+            ×
+          </button>
+
+        </div>
+
+        <div class="confirmacion-contenido">
+
+          <div class="confirmacion-detalle">
+
+            <div>
+              <span>Plan</span>
+              <strong>{{ nombrePlanPorEliminar }}</strong>
+            </div>
+
+            <div>
+              <span>Valor</span>
+              <strong>
+                {{ formatearDinero(mensualidad.monto) }}
+              </strong>
+            </div>
+
+          </div>
+
+          <p>
+            Se eliminará únicamente este registro de mensualidad.
+            La cuenta del usuario no será eliminada.
+          </p>
+
+          @if (mensajeError) {
+            <div class="alerta alerta-error" role="alert">
+              {{ mensajeError }}
+            </div>
+          }
+
+        </div>
+
+        <div class="modal-acciones">
+
+          <button
+            type="button"
+            class="btn-cancelar"
+            [disabled]="eliminando"
+            (click)="cerrarConfirmacion()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-confirmar-eliminar"
+            [disabled]="eliminando"
+            (click)="confirmarEliminacion()">
+            {{
+              eliminando
+                ? 'Eliminando...'
+                : 'Eliminar mensualidad'
+            }}
+          </button>
+
+        </div>
+
+      </section>
+    </div>
+  }
+
+</div>

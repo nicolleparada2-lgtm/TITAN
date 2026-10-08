@@ -1,0 +1,278 @@
+/* =========================================
+   ESTILOS GLOBALES
+   ========================================= */
+
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  background: #f8f9fd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   CAMPOS NUMÉRICOS
+   ========================================= */
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+
+/* =========================================
+   SISTEMA DE TEMAS TITAN
+   ========================================= */
+
+:root {
+  color-scheme: light;
+
+  --titan-fondo: #f8f9fd;
+  --titan-superficie: #ffffff;
+  --titan-superficie-secundaria: #f5f6ff;
+
+  --titan-texto: #172033;
+  --titan-texto-secundario: #64748b;
+
+  --titan-borde: #e2e8f0;
+  --titan-primario: #6366f1;
+  --titan-primario-hover: #4f46e5;
+
+  --titan-sombra: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+:root[data-tema="oscuro"] {
+  color-scheme: dark;
+
+  --titan-fondo: #0c1222;
+  --titan-superficie: #151e32;
+  --titan-superficie-secundaria: #1d2940;
+
+  --titan-texto: #eef2ff;
+  --titan-texto-secundario: #a8b4cf;
+
+  --titan-borde: #33415d;
+  --titan-primario: #a5a3ff;
+  --titan-primario-hover: #c4b5fd;
+
+  --titan-sombra: 0 8px 25px rgba(0, 0, 0, 0.22);
+}
+
+html,
+body {
+  background: var(--titan-fondo);
+  color: var(--titan-texto);
+}
+
+body {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================
+   TITAN - MEJORAS DEL MODO OSCURO
+   ========================================= */
+
+:root[data-tema="oscuro"] body {
+  background: var(--titan-fondo);
+  color: var(--titan-texto);
+}
+
+/* Tarjetas y paneles */
+
+:root[data-tema="oscuro"] .tarjeta,
+:root[data-tema="oscuro"] .card,
+:root[data-tema="oscuro"] .panel {
+  background: var(--titan-superficie);
+  color: var(--titan-texto);
+  border-color: var(--titan-borde);
+  box-shadow: var(--titan-sombra);
+}
+
+/* Títulos y textos principales */
+
+:root[data-tema="oscuro"] h1,
+:root[data-tema="oscuro"] h2,
+:root[data-tema="oscuro"] h3,
+:root[data-tema="oscuro"] h4 {
+  color: var(--titan-texto);
+}
+
+/* Textos secundarios */
+
+:root[data-tema="oscuro"] .descripcion,
+:root[data-tema="oscuro"] .estado p,
+:root[data-tema="oscuro"] .campo label,
+:root[data-tema="oscuro"] .encabezado p,
+:root[data-tema="oscuro"] .cabecera-detalle p {
+  color: var(--titan-texto-secundario);
+}
+
+/* Formularios */
+
+:root[data-tema="oscuro"] input,
+:root[data-tema="oscuro"] select,
+:root[data-tema="oscuro"] textarea {
+  background: var(--titan-superficie-secundaria);
+  color: var(--titan-texto);
+  border-color: var(--titan-borde);
+}
+
+:root[data-tema="oscuro"] input::placeholder,
+:root[data-tema="oscuro"] textarea::placeholder {
+  color: var(--titan-texto-secundario);
+}
+
+/* Tablas */
+
+:root[data-tema="oscuro"] table {
+  color: var(--titan-texto);
+}
+
+:root[data-tema="oscuro"] th {
+  background: var(--titan-superficie-secundaria);
+  color: var(--titan-texto-secundario);
+  border-color: var(--titan-borde);
+}
+
+:root[data-tema="oscuro"] td {
+  color: var(--titan-texto);
+  border-color: var(--titan-borde);
+}
+
+:root[data-tema="oscuro"] td strong {
+  color: var(--titan-texto);
+}
+
+/* Tarjetas de rutinas y ejercicios */
+
+:root[data-tema="oscuro"] .rutina,
+:root[data-tema="oscuro"] .ejercicio,
+:root[data-tema="oscuro"] .sesion {
+  color: var(--titan-texto);
+  border-color: var(--titan-borde);
+}
+
+:root[data-tema="oscuro"] .rutina strong,
+:root[data-tema="oscuro"] .ejercicio strong,
+:root[data-tema="oscuro"] .sesion strong {
+  color: var(--titan-texto);
+}
+
+:root[data-tema="oscuro"] .rutina:hover,
+:root[data-tema="oscuro"] .rutina.seleccionada,
+:root[data-tema="oscuro"] .sesion:hover,
+:root[data-tema="oscuro"] .sesion.seleccionada {
+  background: var(--titan-superficie-secundaria);
+}
+
+/* Contenedores secundarios */
+
+:root[data-tema="oscuro"] .meta,
+:root[data-tema="oscuro"] .notas,
+:root[data-tema="oscuro"] .nueva-serie,
+:root[data-tema="oscuro"] .formulario-ejercicio,
+:root[data-tema="oscuro"] .formulario-interno {
+  background: var(--titan-superficie-secundaria);
+  color: var(--titan-texto);
+  border-color: var(--titan-borde);
+}
+
+/* Botones secundarios */
+
+:root[data-tema="oscuro"] .boton.secundario,
+:root[data-tema="oscuro"] .cerrar {
+  background: var(--titan-superficie-secundaria);
+  color: var(--titan-texto);
+}
+
+/* Divisores */
+
+:root[data-tema="oscuro"] .cabecera-detalle,
+:root[data-tema="oscuro"] .cabecera-tarjeta,
+:root[data-tema="oscuro"] .serie,
+:root[data-tema="oscuro"] .cabecera-historial {
+  border-color: var(--titan-borde);
+}
+
+/* Estados vacíos */
+
+:root[data-tema="oscuro"] .estado h3,
+:root[data-tema="oscuro"] .estado-vacio h3,
+:root[data-tema="oscuro"] .detalle-vacio h3 {
+  color: var(--titan-texto);
+}
+
+:root[data-tema="oscuro"] .estado-vacio p,
+:root[data-tema="oscuro"] .detalle-vacio p {
+  color: var(--titan-texto-secundario);
+}
+
+/* =========================================
+   TITAN - CORRECCIÓN DE CONTRASTE
+   ========================================= */
+
+/* Nombres y descripciones de ejercicios */
+:root[data-tema="oscuro"] .info-ejercicio strong,
+:root[data-tema="oscuro"] .info-ejercicio span,
+:root[data-tema="oscuro"] .datos-ejercicio strong,
+:root[data-tema="oscuro"] .datos-ejercicio span,
+:root[data-tema="oscuro"] .info-rutina strong,
+:root[data-tema="oscuro"] .info-rutina span {
+  color: var(--titan-texto);
+}
+
+/* Información de tarjetas y listados */
+:root[data-tema="oscuro"] .info-usuario strong,
+:root[data-tema="oscuro"] .info-usuario span,
+:root[data-tema="oscuro"] .descripcion,
+:root[data-tema="oscuro"] .detalle-ejercicio,
+:root[data-tema="oscuro"] .nombre-ejercicio {
+  color: var(--titan-texto);
+}
+
+/* Textos secundarios */
+:root[data-tema="oscuro"] .info-ejercicio p,
+:root[data-tema="oscuro"] .info-rutina span,
+:root[data-tema="oscuro"] .datos-ejercicio span,
+:root[data-tema="oscuro"] .descripcion-ejercicio {
+  color: var(--titan-texto-secundario);
+}
+
+/* Valores y etiquetas dentro de las tarjetas */
+:root[data-tema="oscuro"] .meta strong,
+:root[data-tema="oscuro"] .datos-ejercicio strong,
+:root[data-tema="oscuro"] .cabecera-ejercicio strong {
+  color: var(--titan-texto);
+}

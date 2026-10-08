@@ -1,0 +1,119 @@
+
+<div class="aplicacion">
+
+  <header class="barra-superior">
+
+    <nav class="navegacion" aria-label="Navegación principal">
+
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="activo">
+        Inicio
+      </a>
+
+      <a
+        class="enlace-notificaciones"
+        routerLink="/notificaciones"
+        routerLinkActive="activo">
+
+        <span>Notificaciones</span>
+
+        @if (cantidadNotificacionesNoLeidas > 0) {
+          <span class="contador-notificaciones">
+            {{
+              cantidadNotificacionesNoLeidas > 9
+                ? '9+'
+                : cantidadNotificacionesNoLeidas
+            }}
+          </span>
+        }
+
+      </a>
+
+      @if (esUsuario()) {
+        <a
+          routerLink="/planes"
+          routerLinkActive="activo">
+          Planes
+        </a>
+      }
+
+    </nav>
+
+    <a
+      class="marca-titan"
+      routerLink="/dashboard"
+      aria-label="Ir al inicio">
+
+      <img
+        src="/images/titan-logo.png"
+        alt="TITAN">
+
+    </a>
+
+    <div class="acciones-superiores">
+
+      <button
+        class="boton-tema"
+        type="button"
+        (click)="cambiarTema()"
+        [attr.aria-label]="temaService.modo() === 'claro' ? 'Activar modo oscuro' : 'Activar modo claro'"
+        [attr.title]="temaService.modo() === 'claro' ? 'Activar modo oscuro' : 'Activar modo claro'">
+
+        @if (temaService.modo() === 'claro') {
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 14.1A8.7 8.7 0 0 1 9.9 3.5 8.8 8.8 0 1 0 20.5 14.1z"></path>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+        }
+
+      </button>
+
+      <a
+        class="perfil-usuario"
+        routerLink="/perfil"
+        routerLinkActive="perfil-activo"
+        title="Ver mi perfil">
+
+        <div class="avatar-usuario">
+          {{ inicialesUsuario() }}
+        </div>
+
+        @if (usuario) {
+          <div class="datos-usuario">
+
+            <strong>
+              {{ usuario.nombre_completo }}
+            </strong>
+
+            <span>
+              {{ usuario.rol }}
+            </span>
+
+          </div>
+        }
+
+      </a>
+
+      <div class="separador"></div>
+
+      <button
+        class="boton-salir"
+        type="button"
+        (click)="cerrarSesion()">
+        Salir
+      </button>
+
+    </div>
+
+  </header>
+
+  <main class="contenido">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

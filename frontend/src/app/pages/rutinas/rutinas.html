@@ -1,0 +1,568 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+    <div>
+      <span class="seccion">
+        {{ esSeguimiento ? 'SEGUIMIENTO' : 'ENTRENAMIENTO' }}
+      </span>
+
+      <h1>Rutinas</h1>
+
+      <p>{{ descripcionPagina }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="boton primario"
+      (click)="abrirFormulario()">
+      + Nueva rutina
+    </button>
+  </header>
+
+  @if (esSeguimiento && usuarioSeguimiento) {
+
+    <div class="alerta seguimiento">
+      <div>
+        <strong>
+          Seguimiento de {{ usuarioSeguimiento.nombre_completo }}
+        </strong>
+
+        <span>
+          &#64;{{ usuarioSeguimiento.nombre_usuario }}
+          · Estás administrando sus rutinas como entrenador.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="volverMisUsuarios()">
+        Volver a mis usuarios
+      </button>
+    </div>
+
+  }
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (mostrarFormulario) {
+
+    <section class="tarjeta formulario">
+
+      <div class="titulo-seccion">
+        <div>
+          <h2>
+            {{ editando ? 'Editar rutina' : 'Nueva rutina' }}
+          </h2>
+
+          <p>Define la información principal.</p>
+        </div>
+
+        <button
+          type="button"
+          class="cerrar"
+          aria-label="Cerrar formulario"
+          (click)="cancelarFormulario()">
+          ×
+        </button>
+      </div>
+
+      <form (ngSubmit)="guardarRutina()">
+
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+
+          <input
+            id="nombre"
+            name="nombre"
+            type="text"
+            [(ngModel)]="nombre"
+            placeholder="Ej. Rutina de fuerza">
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            rows="3"
+            [(ngModel)]="descripcion"
+            placeholder="Describe el objetivo de la rutina">
+          </textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="cancelarFormulario()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="boton primario"
+            [disabled]="guardando">
+            {{
+              guardando
+                ? 'Guardando...'
+                : editando
+                  ? 'Guardar cambios'
+                  : 'Crear rutina'
+            }}
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  }
+
+  <div class="distribucion">
+
+    <section class="tarjeta panel-rutinas">
+
+      <div class="cabecera-tarjeta">
+        <div>
+          <h2>{{ tituloRutinas }}</h2>
+          <p>{{ rutinas.length }} registrada(s)</p>
+        </div>
+      </div>
+
+      <div class="buscador">
+        <input
+          type="search"
+          [(ngModel)]="busqueda"
+          aria-label="Buscar rutina"
+          placeholder="Buscar rutina...">
+      </div>
+
+      @if (cargando) {
+
+        <div class="estado">
+          <h3>Cargando rutinas</h3>
+          <p>Estamos obteniendo la información.</p>
+        </div>
+
+      } @else if (rutinasFiltradas.length === 0) {
+
+        <div class="estado">
+          <h3>
+            {{
+              busqueda.trim()
+                ? 'No se encontraron rutinas'
+                : esSeguimiento
+                  ? 'Este usuario no tiene rutinas'
+                  : 'No tienes rutinas'
+            }}
+          </h3>
+
+          <p>
+            {{
+              busqueda.trim()
+                ? 'Prueba con otro término de búsqueda.'
+                : esSeguimiento
+                  ? 'Puedes crear una rutina para este usuario.'
+                  : 'Crea una rutina para comenzar.'
+            }}
+          </p>
+        </div>
+
+      } @else {
+
+        <div class="lista-rutinas">
+
+          @for (rutina of rutinasFiltradas; track rutina.id) {
+
+            <article
+              class="rutina"
+              [class.seleccionada]="rutinaSeleccionada?.id === rutina.id"
+              (click)="seleccionarRutina(rutina)">
+
+              <div class="icono-rutina">R</div>
+
+              <div class="info-rutina">
+                <strong>{{ rutina.nombre }}</strong>
+
+                <span>
+                  {{ rutina.descripcion || 'Sin descripción' }}
+                </span>
+              </div>
+
+              <div class="acciones-rutina">
+
+                <button
+                  type="button"
+                  (click)="editarRutina(rutina); $event.stopPropagation()">
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  class="peligro"
+                  (click)="eliminarRutina(rutina); $event.stopPropagation()">
+                  Eliminar
+                </button>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+    <section class="tarjeta detalle">
+
+      @if (!rutinaSeleccionada) {
+
+        <div class="estado detalle-vacio">
+          <div class="circulo">R</div>
+
+          <h3>Selecciona una rutina</h3>
+
+          <p>
+            Aquí podrás consultar y administrar
+            los ejercicios que contiene.
+          </p>
+        </div>
+
+      } @else {
+
+        <div class="cabecera-detalle">
+
+          <div>
+            <span class="seccion">RUTINA SELECCIONADA</span>
+
+            <h2>{{ rutinaSeleccionada.nombre }}</h2>
+
+            <p>
+              {{ rutinaSeleccionada.descripcion || 'Sin descripción' }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="boton primario"
+            (click)="abrirAgregarEjercicio()">
+            + Ejercicio
+          </button>
+
+        </div>
+
+        @if (mostrarFormularioEjercicio) {
+
+          <form
+            class="formulario-ejercicio"
+            (ngSubmit)="agregarEjercicio()">
+
+            <div class="campo ejercicio-selector">
+              <label for="ejercicioId">Ejercicio</label>
+
+              <select
+                id="ejercicioId"
+                name="ejercicioId"
+                [(ngModel)]="ejercicioId">
+
+                <option [ngValue]="0">
+                  Selecciona un ejercicio
+                </option>
+
+                @for (ejercicio of ejercicios; track ejercicio.id) {
+                  <option [ngValue]="ejercicio.id">
+                    {{ ejercicio.nombre }}
+                  </option>
+                }
+
+              </select>
+            </div>
+
+            <div class="campos-numericos">
+
+              <div class="campo">
+                <label for="series">Series</label>
+
+                <input
+                  id="series"
+                  type="number"
+                  name="series"
+                  min="1"
+                  [(ngModel)]="series">
+              </div>
+
+              <div class="campo">
+                <label for="repeticiones">Repeticiones</label>
+
+                <input
+                  id="repeticiones"
+                  type="number"
+                  name="repeticiones"
+                  min="1"
+                  [(ngModel)]="repeticiones">
+              </div>
+
+              <div class="campo">
+                <label for="descanso">Descanso (s)</label>
+
+                <input
+                  id="descanso"
+                  type="number"
+                  name="descanso"
+                  min="0"
+                  [(ngModel)]="descansoSegundos">
+              </div>
+
+              <div class="campo">
+                <label for="orden">Orden</label>
+
+                <input
+                  id="orden"
+                  type="number"
+                  name="orden"
+                  min="1"
+                  [(ngModel)]="ordenEjercicio">
+              </div>
+
+            </div>
+
+            <div class="acciones-formulario">
+
+              <button
+                type="button"
+                class="boton secundario"
+                (click)="cancelarAgregarEjercicio()">
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                class="boton primario"
+                [disabled]="guardando">
+                {{ guardando ? 'Agregando...' : 'Agregar' }}
+              </button>
+
+            </div>
+
+          </form>
+
+        }
+
+        @if (ejerciciosRutina.length === 0) {
+
+          <div class="estado">
+            <h3>Rutina vacía</h3>
+
+            <p>
+              Agrega ejercicios para comenzar a estructurarla.
+            </p>
+          </div>
+
+        } @else {
+
+          <div class="lista-ejercicios">
+
+            @for (item of ejerciciosRutina; track item.id) {
+
+              <article class="ejercicio">
+
+                <div class="orden">
+                  {{ item.orden_ejercicio }}
+                </div>
+
+                <div class="datos-ejercicio">
+
+                  <strong>
+                    {{ obtenerNombreEjercicio(item.ejercicio_id) }}
+                  </strong>
+
+                  <span>
+                    {{ item.series }} series ·
+                    {{ item.repeticiones }} repeticiones ·
+                    {{ item.descanso_segundos || 0 }} s descanso
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="quitar"
+                  (click)="quitarEjercicio(item)">
+                  Quitar
+                </button>
+
+              </article>
+
+            }
+
+          </div>
+
+        }
+
+      }
+
+    </section>
+
+  </div>
+
+</div>
+
+<!-- Confirmación para eliminar una rutina -->
+
+@if (rutinaPorEliminar; as rutina) {
+
+  <div
+    class="modal-fondo"
+    (click)="cerrarConfirmacionRutina()">
+
+    <section
+      class="modal-confirmacion"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-eliminar-rutina"
+      aria-describedby="descripcion-eliminar-rutina"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-icono">!</div>
+
+      <span class="modal-etiqueta">
+        CONFIRMAR ELIMINACIÓN
+      </span>
+
+      <h2 id="titulo-eliminar-rutina">
+        ¿Eliminar rutina?
+      </h2>
+
+      <p id="descripcion-eliminar-rutina">
+        Estás a punto de eliminar la siguiente rutina:
+      </p>
+
+      <div class="modal-detalle">
+
+        <strong>{{ rutina.nombre }}</strong>
+
+        <span>
+          {{ rutina.descripcion || 'Sin descripción' }}
+        </span>
+
+      </div>
+
+      <p class="modal-advertencia">
+        Esta acción eliminará la rutina de forma permanente.
+        No se puede deshacer.
+      </p>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton secundario"
+          [disabled]="eliminando"
+          (click)="cerrarConfirmacionRutina()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarEliminarRutina()">
+          {{ eliminando ? 'Eliminando...' : 'Eliminar rutina' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}
+
+<!-- Confirmación para quitar un ejercicio de la rutina -->
+
+@if (ejercicioPorQuitar; as item) {
+
+  <div
+    class="modal-fondo"
+    (click)="cerrarConfirmacionEjercicio()">
+
+    <section
+      class="modal-confirmacion"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-quitar-ejercicio"
+      aria-describedby="descripcion-quitar-ejercicio"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-icono">!</div>
+
+      <span class="modal-etiqueta">
+        CONFIRMAR ELIMINACIÓN
+      </span>
+
+      <h2 id="titulo-quitar-ejercicio">
+        ¿Quitar ejercicio?
+      </h2>
+
+      <p id="descripcion-quitar-ejercicio">
+        Vas a quitar el siguiente ejercicio de la rutina:
+      </p>
+
+      <div class="modal-detalle">
+
+        <strong>
+          {{ obtenerNombreEjercicio(item.ejercicio_id) }}
+        </strong>
+
+        <span>
+          {{ item.series }} series ·
+          {{ item.repeticiones }} repeticiones
+        </span>
+
+      </div>
+
+      <p class="modal-advertencia">
+        El ejercicio dejará de formar parte de esta rutina,
+        pero seguirá disponible en el catálogo general.
+      </p>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton secundario"
+          [disabled]="eliminando"
+          (click)="cerrarConfirmacionEjercicio()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarQuitarEjercicio()">
+          {{ eliminando ? 'Quitando...' : 'Quitar ejercicio' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}

@@ -1,0 +1,409 @@
+
+<div class="pagina">
+
+  <header class="encabezado">
+    <div>
+      <span class="seccion">
+        {{ esSeguimiento ? 'SEGUIMIENTO' : 'PROGRESO PERSONAL' }}
+      </span>
+
+      <h1>Objetivos</h1>
+
+      <p>{{ descripcionPagina }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="boton primario"
+      (click)="abrirFormulario()">
+      + Nuevo objetivo
+    </button>
+  </header>
+
+  @if (esSeguimiento && usuarioSeguimiento) {
+
+    <div class="alerta seguimiento">
+
+      <div>
+        <strong>
+          Seguimiento de {{ usuarioSeguimiento.nombre_completo }}
+        </strong>
+
+        <span>
+          &#64;{{ usuarioSeguimiento.nombre_usuario }}
+          · Estás administrando sus objetivos como entrenador.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="volverMisUsuarios()">
+        Volver a mis usuarios
+      </button>
+
+    </div>
+
+  }
+
+  @if (mensajeExito) {
+    <div class="alerta exito" role="status">
+      {{ mensajeExito }}
+    </div>
+  }
+
+  @if (mensajeError) {
+    <div class="alerta error" role="alert">
+      {{ mensajeError }}
+    </div>
+  }
+
+  @if (mostrarFormulario) {
+
+    <section class="tarjeta formulario">
+
+      <div class="cabecera-formulario">
+
+        <div>
+          <h2>
+            {{ editando ? 'Editar objetivo' : 'Nuevo objetivo' }}
+          </h2>
+
+          <p>
+            {{
+              esSeguimiento && usuarioSeguimiento
+                ? 'Registra una meta para ' + usuarioSeguimiento.nombre_completo + '.'
+                : 'Registra la meta que deseas alcanzar.'
+            }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="cerrar"
+          aria-label="Cerrar formulario"
+          (click)="cancelar()">
+          ×
+        </button>
+
+      </div>
+
+      <form (ngSubmit)="guardarObjetivo()">
+
+        <div class="campo">
+          <label for="titulo">Título</label>
+
+          <input
+            id="titulo"
+            type="text"
+            name="titulo"
+            [(ngModel)]="titulo"
+            placeholder="Ej. Alcanzar 70 kg">
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            rows="3"
+            [(ngModel)]="descripcion"
+            placeholder="Descripción opcional">
+          </textarea>
+        </div>
+
+        <div class="grid">
+
+          <div class="campo">
+            <label for="tipoObjetivo">Tipo</label>
+
+            <select
+              id="tipoObjetivo"
+              name="tipoObjetivo"
+              [(ngModel)]="tipoObjetivo"
+              (change)="cambiarTipo()">
+
+              <option value="PESO">Peso</option>
+              <option value="MEDIDA">Medida corporal</option>
+              <option value="SESIONES">Número de sesiones</option>
+              <option value="OTRO">Otro</option>
+
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="valorObjetivo">Valor objetivo</label>
+
+            <input
+              id="valorObjetivo"
+              type="number"
+              name="valorObjetivo"
+              step="0.01"
+              [(ngModel)]="valorObjetivo">
+          </div>
+
+          <div class="campo">
+            <label for="unidad">Unidad</label>
+
+            <input
+              id="unidad"
+              type="text"
+              name="unidad"
+              [(ngModel)]="unidad"
+              placeholder="kg, cm, sesiones...">
+          </div>
+
+        </div>
+
+        <div class="grid fechas">
+
+          <div class="campo">
+            <label for="fechaInicio">Fecha de inicio</label>
+
+            <input
+              id="fechaInicio"
+              type="date"
+              name="fechaInicio"
+              [(ngModel)]="fechaInicio">
+          </div>
+
+          <div class="campo">
+            <label for="fechaObjetivo">Fecha de finalización</label>
+
+            <input
+              id="fechaObjetivo"
+              type="date"
+              name="fechaObjetivo"
+              [(ngModel)]="fechaObjetivo">
+          </div>
+
+          @if (editando) {
+
+            <div class="campo">
+              <label for="estado">Estado</label>
+
+              <select
+                id="estado"
+                name="estado"
+                [(ngModel)]="estado">
+
+                <option value="EN_PROGRESO">En progreso</option>
+                <option value="COMPLETADO">Completado</option>
+                <option value="CANCELADO">Cancelado</option>
+
+              </select>
+            </div>
+
+          }
+
+        </div>
+
+        <div class="acciones-formulario">
+
+          <button
+            type="button"
+            class="boton secundario"
+            (click)="cancelar()">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="boton primario"
+            [disabled]="guardando">
+            {{
+              guardando
+                ? 'Guardando...'
+                : editando
+                  ? 'Guardar cambios'
+                  : 'Crear objetivo'
+            }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  }
+
+  @if (cargando) {
+
+    <section class="tarjeta estado-vacio">
+      <h3>Cargando objetivos...</h3>
+    </section>
+
+  } @else if (objetivos.length === 0) {
+
+    <section class="tarjeta estado-vacio">
+
+      <div class="icono">O</div>
+
+      <h3>
+        {{
+          esSeguimiento
+            ? 'Este usuario aún no tiene objetivos'
+            : 'Aún no hay objetivos'
+        }}
+      </h3>
+
+      <p>
+        {{
+          esSeguimiento
+            ? 'Puedes crear una meta para comenzar su seguimiento.'
+            : 'Crea una meta para comenzar a registrar tu progreso.'
+        }}
+      </p>
+
+    </section>
+
+  } @else {
+
+    <section class="objetivos-grid">
+
+      @for (objetivo of objetivos; track objetivo.id) {
+
+        <article class="tarjeta objetivo">
+
+          <div class="cabecera-objetivo">
+
+            <span
+              class="estado"
+              [class]="claseEstado(objetivo.estado)">
+              {{ textoEstado(objetivo.estado) }}
+            </span>
+
+            <div class="acciones">
+
+              <button
+                type="button"
+                (click)="editarObjetivo(objetivo)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="eliminar"
+                (click)="eliminarObjetivo(objetivo)">
+                Eliminar
+              </button>
+
+            </div>
+
+          </div>
+
+          <h2>{{ objetivo.titulo }}</h2>
+
+          <p class="descripcion">
+            {{ objetivo.descripcion || 'Sin descripción' }}
+          </p>
+
+          <div class="meta">
+
+            <span>Meta</span>
+
+            <strong>
+              {{ objetivo.valor_objetivo }}
+              {{ objetivo.unidad }}
+            </strong>
+
+          </div>
+
+          <div class="fechas-objetivo">
+
+            <span>
+              Inicio: {{ objetivo.fecha_inicio }}
+            </span>
+
+            @if (objetivo.fecha_objetivo) {
+              <span>
+                Fecha de finalización:
+                {{ objetivo.fecha_objetivo }}
+              </span>
+            }
+
+          </div>
+
+        </article>
+
+      }
+
+    </section>
+
+  }
+
+</div>
+
+@if (objetivoPorEliminar; as objetivo) {
+
+  <div
+    class="modal-fondo"
+    (click)="cerrarConfirmacion()">
+
+    <section
+      class="modal-confirmacion"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-eliminar-objetivo"
+      aria-describedby="descripcion-eliminar-objetivo"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-icono">!</div>
+
+      <span class="modal-etiqueta">
+        CONFIRMAR ELIMINACIÓN
+      </span>
+
+      <h2 id="titulo-eliminar-objetivo">
+        ¿Eliminar objetivo?
+      </h2>
+
+      <p id="descripcion-eliminar-objetivo">
+        Estás a punto de eliminar el siguiente objetivo:
+      </p>
+
+      <div class="modal-detalle">
+
+        <strong>{{ objetivo.titulo }}</strong>
+
+        <span>
+          Meta: {{ objetivo.valor_objetivo }} {{ objetivo.unidad }}
+        </span>
+
+        <span>
+          Estado: {{ textoEstado(objetivo.estado) }}
+        </span>
+
+      </div>
+
+      <p class="modal-advertencia">
+        Esta acción eliminará el objetivo de forma permanente.
+        No se puede deshacer.
+      </p>
+
+      <div class="modal-acciones">
+
+        <button
+          type="button"
+          class="boton secundario"
+          [disabled]="eliminando"
+          (click)="cerrarConfirmacion()">
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="boton modal-eliminar"
+          [disabled]="eliminando"
+          (click)="confirmarEliminacion()">
+          {{ eliminando ? 'Eliminando...' : 'Eliminar objetivo' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}

@@ -1,0 +1,222 @@
+<div class="pagina-planes">
+
+  <header class="encabezado">
+
+    <span class="etiqueta">
+      Membresías
+    </span>
+
+    <h1>
+      Encuentra el plan ideal para ti
+    </h1>
+
+    <p>
+      Conoce las opciones de membresía disponibles
+      y los beneficios que ofrece cada una.
+    </p>
+
+  </header>
+
+
+  @if (cargando) {
+
+    <div class="estado-pagina">
+
+      <div class="spinner"></div>
+
+      <strong>
+        Cargando planes
+      </strong>
+
+      <p>
+        Consultando las opciones disponibles.
+      </p>
+
+    </div>
+
+  } @else if (mensajeError) {
+
+    <div class="estado-pagina error">
+
+      <strong>
+        No pudimos cargar los planes
+      </strong>
+
+      <p>
+        {{ mensajeError }}
+      </p>
+
+    </div>
+
+  } @else {
+
+    <section class="planes-grid">
+
+      @for (plan of planes; track plan.id) {
+
+        <article
+          class="plan"
+          [class.plan-actual]="esPlanActual(plan.id)"
+        >
+
+          <div class="plan-superior">
+
+            <div
+              class="icono-plan"
+              [class.icono-plan-actual]="esPlanActual(plan.id)"
+            >
+              {{ plan.nombre.charAt(0) }}
+            </div>
+
+
+            @if (esPlanActual(plan.id)) {
+
+              <span class="estado-plan plan-seleccionado">
+                Tu plan actual
+              </span>
+
+            } @else {
+
+              <span class="estado-plan">
+                Disponible
+              </span>
+
+            }
+
+          </div>
+
+
+          <div class="plan-nombre">
+
+            <span>
+              PLAN
+            </span>
+
+            <h2>
+              {{ plan.nombre }}
+            </h2>
+
+          </div>
+
+
+          <div class="precio">
+
+            <strong>
+              {{ formatearDinero(plan.precio) }}
+            </strong>
+
+            <span>
+              / {{ plan.duracion_dias }} días
+            </span>
+
+          </div>
+
+
+          <p class="descripcion">
+            {{
+              plan.descripcion
+              || 'Plan de membresía del gimnasio.'
+            }}
+          </p>
+
+
+          <div class="detalle">
+
+            <div>
+
+              <span>
+                Duración
+              </span>
+
+              <strong>
+                {{ plan.duracion_dias }} días
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Estado
+              </span>
+
+              <strong>
+                {{ plan.estado }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          @if (
+            usuario?.rol === 'USUARIO' &&
+            esPlanActual(plan.id)
+          ) {
+
+            <div class="mensaje-plan mensaje-plan-actual">
+
+              <strong>
+                Este es tu plan actual
+              </strong>
+
+              <span>
+                Consulta su vigencia e historial
+                desde Mi membresía.
+              </span>
+
+            </div>
+
+          } @else if (usuario?.rol === 'USUARIO') {
+
+            <div class="mensaje-plan">
+
+              Consulta con la administración para
+              adquirir o cambiar a este plan.
+
+            </div>
+
+          } @else {
+
+            <div class="mensaje-plan">
+
+              Plan disponible para los usuarios
+              del gimnasio.
+
+            </div>
+
+          }
+
+        </article>
+
+      }
+
+    </section>
+
+
+    <section class="informacion">
+
+      <div class="informacion-icono">
+        i
+      </div>
+
+      <div>
+
+        <strong>
+          ¿Cómo adquirir un plan?
+        </strong>
+
+        <p>
+          La activación y renovación de membresías
+          se realiza directamente con la administración
+          del gimnasio.
+        </p>
+
+      </div>
+
+    </section>
+
+  }
+
+</div>
