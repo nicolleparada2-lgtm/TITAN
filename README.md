@@ -269,6 +269,22 @@ La base de datos debe disponer de las tablas definidas por los modelos SQLAlchem
 
 El archivo `TITAN-MER.pdf` documenta el modelo relacional, pero no es un script de creación de tablas.
 
+
+### Crear las tablas de la base de datos
+
+Después de crear la base de datos en PostgreSQL y configurar
+el archivo `backend/.env`, ejecutar desde la carpeta `backend`:
+
+```powershell
+python crear_tablas.py
+```
+
+Este script utiliza los modelos SQLAlchemy para crear las 14
+tablas necesarias para el funcionamiento de TITAN.
+
+Las tablas existentes no se eliminan ni se reemplazan. El script
+no realiza migraciones ni actualiza columnas de tablas existentes.
+
 ### 9.4. Iniciar FastAPI
 
 Desde `backend`, con el entorno virtual activo:
