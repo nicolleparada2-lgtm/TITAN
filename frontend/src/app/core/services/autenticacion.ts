@@ -1,6 +1,8 @@
+
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface LoginDatos {
   nombre_usuario: string;
@@ -13,11 +15,12 @@ interface TokenRespuesta {
 }
 
 @Injectable({
+  
   providedIn: 'root'
 })
 export class Autenticacion {
   private http = inject(HttpClient);
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = environment.apiUrl;
 
   login(datos: LoginDatos): Observable<TokenRespuesta> {
     return this.http.post<TokenRespuesta>(
@@ -42,3 +45,4 @@ export class Autenticacion {
     return this.obtenerToken() !== null;
   }
 }
+

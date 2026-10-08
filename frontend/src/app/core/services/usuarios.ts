@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Usuario {
   id: number;
@@ -44,7 +45,7 @@ export interface MensajeRespuesta {
 })
 export class Usuarios {
   private http = inject(HttpClient);
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = environment.apiUrl;
 
   obtenerMiPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(

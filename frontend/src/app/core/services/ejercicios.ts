@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface GrupoMuscular {
   id: number;
@@ -28,7 +29,7 @@ export interface EjercicioDatos {
 })
 export class EjerciciosService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://127.0.0.1:8000/ejercicios';
+  private apiUrl = `${environment.apiUrl}/ejercicios`;
 
   listarEjercicios(): Observable<Ejercicio[]> {
     return this.http.get<Ejercicio[]>(this.apiUrl);

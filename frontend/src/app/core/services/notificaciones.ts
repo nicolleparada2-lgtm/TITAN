@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-
+import { environment } from '../../../environments/environment';
 
 export interface Notificacion {
   id: number;
@@ -20,8 +20,7 @@ export interface Notificacion {
 export class Notificaciones {
   private http = inject(HttpClient);
 
-  private apiUrl =
-    'http://127.0.0.1:8000/notificaciones';
+  private apiUrl = `${environment.apiUrl}/notificaciones`;
 
   private cantidadNoLeidasSubject =
     new BehaviorSubject<number>(0);
